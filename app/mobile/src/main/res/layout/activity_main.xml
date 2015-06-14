@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:weightSum="1"
         android:showDividers="beginning|none|middle|end"
-        android:id="@+id/">
+        android:id="@+id/layout">
 
         <Button
             android:layout_width="149dp"
