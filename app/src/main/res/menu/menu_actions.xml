@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/login_logout"
+    <item android:id="@+id/signin_signout"
           android:title="@string/sign_in"
           android:theme="@style/ShareWearActionBarTheme" />
 </menu>
