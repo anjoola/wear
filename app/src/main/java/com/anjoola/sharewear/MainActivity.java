@@ -1,5 +1,6 @@
 package com.anjoola.sharewear;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -7,11 +8,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -24,7 +27,7 @@ import com.google.android.gms.plus.model.people.Person;
 
 
 // TODO rename to LoginActivity
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends Activity implements
         ConnectionCallbacks, OnConnectionFailedListener,
         View.OnClickListener {
 
@@ -47,6 +50,7 @@ public class MainActivity extends FragmentActivity implements
     // Used to connect to Google Play Services and allow Google+ sign in.
     private GoogleApiClient mGoogleApiClient;
 
+    private Menu mActionBarMenu;
 
 
 
@@ -168,6 +172,8 @@ public class MainActivity extends FragmentActivity implements
         mSignInButton.setEnabled(false);
         mSignOutButton.setEnabled(true);
 
+        checkSignInOption();
+
         // TODO update
         // Retrieve some profile information to personalize our app for the user.
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
@@ -207,6 +213,40 @@ public class MainActivity extends FragmentActivity implements
 
         // User is signed out if no connection go Google Play Services.
         onSignedOut();
+    }
+
+    /**
+     * Toggle the action bar item between "Sign In" and "Sign Out" depending
+     * on the user's signed-in status.
+     */
+    private void checkSignInOption() {
+        MenuItem item = mActionBarMenu.findItem(R.id.login_logout);
+        if (mGoogleApiClient.isConnected())
+            item.setTitle(R.string.sign_out);
+        else
+            item.setTitle(R.string.sign_in);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Add items to action bar if present.
+        getMenuInflater().inflate(R.menu.menu_actions, menu);
+        mActionBarMenu = menu;
+        checkSignInOption();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.login_logout:
+                Toast.makeText(this, "LOGGING IN Item 1 selected", Toast.LENGTH_SHORT)
+                        .show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**

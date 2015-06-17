@@ -2,10 +2,13 @@
 
 <resources>
 
+    <!-- Action Bar Strings -->
     <string name="app_name">ShareWear</string>
-    <string name="login">Login</string>
-    <string name="sign_out_button_name">Sign Out</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_out">Sign Out</string>
 
+
+    <string name="sign_out_button_name">Sign Out</string>
     <string name="status_signing_in">Signing in with Google+…</string>
     <string name="status_signed_out">Signed out</string>
     <string name="signed_in_as">Signed in as %s</string>
