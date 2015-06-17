@@ -3,6 +3,7 @@
 <resources>
 
     <string name="app_name">ShareWear</string>
+    <string name="login">Login</string>
     <string name="sign_out_button_name">Sign Out</string>
 
     <string name="status_signing_in">Signing in with Google+…</string>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ShareWearTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
+        <item name="android:windowActionBar">true</item>
+
+        <item name="android:colorPrimary">#009688</item>
+        <item name="android:colorPrimaryDark">#00796B</item>
+        <item name="android:colorAccent">#FF4081</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:textColorSecondary">#727272</item>
+        <item name="android:actionMenuTextColor">#212121</item>
+    </style>
+
+    <style name="ShareWearActionBarTheme" parent="@style/ShareWearTheme">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+</resources>
