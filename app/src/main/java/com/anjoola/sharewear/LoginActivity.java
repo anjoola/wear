@@ -64,9 +64,6 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // Used to connect to Google Play Services and allow Google+ sign in.
     private GoogleApiClient mGoogleApiClient;
 
-    // Reference to the global application.
-    private ShareWearApplication app;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
