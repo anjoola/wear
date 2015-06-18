@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/action_search"
+          android:icon="@mipmap/ic_action_search"
+          android:title="@string/search"
+          android:showAsAction="ifRoom" />
+
     <item android:id="@+id/action_sign_out"
           android:title="@string/sign_out"
           android:theme="@style/ShareWearActionBarTheme" />
+
 </menu>

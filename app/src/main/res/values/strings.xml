@@ -4,6 +4,7 @@
 
     <!-- Standard -->
     <string name="app_name">ShareWear</string>
+    <string name="search">Search</string>
     <string name="sign_out">Sign Out</string>
     <string name="close">Close</string>
 
