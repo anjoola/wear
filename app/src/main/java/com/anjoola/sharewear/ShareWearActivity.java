@@ -9,15 +9,12 @@ import android.view.MenuItem;
  * in and out.
  */
 public class ShareWearActivity extends ShareWearBaseActivity {
-    // Menu bar.
-    private Menu mActionBarMenu;
     public final static String SIGN_OUT = "SIGN_OUT";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Add items to action bar if present.
         getMenuInflater().inflate(R.menu.menu_actions, menu);
-        mActionBarMenu = menu;
         return true;
     }
 

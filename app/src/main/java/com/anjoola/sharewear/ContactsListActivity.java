@@ -1,99 +1,203 @@
 package com.anjoola.sharewear;
 
-import android.content.ContentResolver;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.AbsListView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 public class ContactsListActivity extends ShareWearActivity {
-    public TextView outputText;
+    // ListView to store all contacts.
+    ListView mContactsList;
+
+    // Adapter for mapping columns from cursor to ListView.
+    SimpleCursorAdapter mAdapter;
+
+    // Asynchronous task to retrieve and load ListView with contacts.
+    ContactsListLoader mLoader;
+
+
+    MatrixCursor mMatrixCursor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_list_activity);
-        outputText = (TextView)findViewById(R.id.textView1);
-        fetchContacts();
+
+        // Set up contacts list view. Set adapter and scroll listener for
+        // infinite scrolling.
+        mContactsList = (ListView) findViewById(R.id.contacts_list);
+        mContactsList.setOnScrollListener(new EndlessScrollListener());
+        mAdapter = new SimpleCursorAdapter(getBaseContext(),
+                R.layout.contacts_list_view_layout,
+                null,
+                new String[] { "name","photo","details"}, // TODO
+                new int[] { R.id.name,R.id.photo,R.id.details}, 0);
+        mContactsList.setAdapter(mAdapter);
+
+        // TODO
+        // The contacts from the contacts content provider is stored in this cursor
+        mMatrixCursor = new MatrixCursor(new String[] { "_id","name","photo","details"} );
+
+        // Set up asynchronous task and start it.
+        mLoader = new ContactsListLoader();
+        mLoader.execute();
     }
 
-    public void fetchContacts() {
-Toast.makeText(this, "GOT HERE", Toast.LENGTH_SHORT).show();
-        String phoneNumber = null;
-        String email = null;
+    /** An AsyncTask class to retrieve and load listview with contacts */
+    private class ContactsListLoader extends AsyncTask<Void, Void, Cursor> {
 
-        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
-        String _ID = ContactsContract.Contacts._ID;
-        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY;
-        String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
+        // URIs for retrieving contacts information.
+        private final Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;
+        private final Uri DATA_URI = ContactsContract.Data.CONTENT_URI;
 
-        Uri PhoneCONTENT_URI = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String Phone_CONTACT_ID = ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
-        String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
+        // Cursor for retrieving all contacts.
+        private Cursor cursor;
 
-        Uri EmailCONTENT_URI =  ContactsContract.CommonDataKinds.Email.CONTENT_URI;
-        String EmailCONTACT_ID = ContactsContract.CommonDataKinds.Email.CONTACT_ID;
-        String DATA = ContactsContract.CommonDataKinds.Email.DATA;
+        public ContactsListLoader() {
+            cursor = getContentResolver().query(CONTACTS_URI, null, null,
+                    null, ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
+        }
 
-        StringBuffer output = new StringBuffer();
+        @Override
+        protected Cursor doInBackground(Void... params) {
+            int i = 0;
+            if(cursor.moveToFirst()){
+                do{
+                    i++;
+                    if ( i > 10) break;
+                    long contactId = cursor.getLong(cursor.getColumnIndex("_ID"));
 
-        ContentResolver contentResolver = getContentResolver();
+                    // Querying the table ContactsContract.Data to retrieve individual items like
+                    // home phone, mobile phone, work email etc corresponding to each contact
+                    Cursor dataCursor = getContentResolver().query(DATA_URI, null,
+                            ContactsContract.Data.CONTACT_ID + "=" + contactId,
+                            null, null);
 
-        Cursor cursor = contentResolver.query(CONTENT_URI, null,null, null, null);
+                    String displayName="";
+                    String nickName="";
+                    String homePhone="";
+                    String mobilePhone="";
+                    String workPhone="";
+                    String photoPath="" ;// R.drawable.blank;
+                    byte[] photoByte=null;
+                    String homeEmail="";
+                    String workEmail="";
+                    String companyName="";
+                    String title="";
 
-        // Loop for every contact in the phone
-        if (cursor.getCount() > 0) {
-            Log.e("---------------------", "STUPID");
+                    if(dataCursor.moveToFirst()){
+                        // Getting Display Name
+                        displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
+                        do{
 
-            while (cursor.moveToNext()) {
+                            // Getting NickName
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE))
+                                nickName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
 
+                            // Getting Phone numbers
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)){
+                                switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME :
+                                        homePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE :
+                                        mobilePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK :
+                                        workPhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                }
+                            }
 
+                            // Getting EMails
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE ) ) {
+                                switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
+                                    case ContactsContract.CommonDataKinds.Email.TYPE_HOME :
+                                        homeEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Email.TYPE_WORK :
+                                        workEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                }
+                            }
 
-                String contact_id = cursor.getString(cursor.getColumnIndex( _ID ));
-                String name = cursor.getString(cursor.getColumnIndex( DISPLAY_NAME ));
+                            // Getting Organization details
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)){
+                                companyName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                title = dataCursor.getString(dataCursor.getColumnIndex("data4"));
+                            }
 
-                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex( HAS_PHONE_NUMBER )));
+                        }while(dataCursor.moveToNext());
+                        String details = "";
 
-                if (hasPhoneNumber > 0) {
-                    Log.e("---------------------", "aaaa");
-                    outputText.append(name + "\n");
+                        // Concatenating various information to single string
+                        if(mobilePhone != null && !mobilePhone.equals("") )
+                            details += "MobilePhone : " + mobilePhone + "\n";
+                        if(workPhone != null && !workPhone.equals("") )
+                            details += "WorkPhone : " + workPhone + "\n";
+                        if(nickName != null && !nickName.equals("") )
+                            details += "NickName : " + nickName + "\n";
+                        if(homeEmail != null && !homeEmail.equals("") )
+                            details += "HomeEmail : " + homeEmail + "\n";
+                        if(workEmail != null && !workEmail.equals("") )
+                            details += "WorkEmail : " + workEmail + "\n";
+                        if(companyName != null && !companyName.equals("") )
+                            details += "CompanyName : " + companyName + "\n";
+                        if(title != null && !title.equals("") )
+                            details += "Title : " + title + "\n";
 
-                    output.append("\n First Name:" + name);
-
-                    // Query and loop for every phone number of the contact
-                    Cursor phoneCursor = contentResolver.query(PhoneCONTENT_URI, null, Phone_CONTACT_ID + " = ?", new String[] { contact_id }, null);
-
-                    while (phoneCursor.moveToNext()) {
-                        phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
-                        output.append("\n Phone number:" + phoneNumber);
-
+                        // Adding id, display name, path to photo and other details to cursor
+                        mMatrixCursor.addRow(new Object[]{ Long.toString(contactId),displayName,photoPath,details});
                     }
-
-                    phoneCursor.close();
-
-                    // Query and loop for every email of the contact
-                    Cursor emailCursor = contentResolver.query(EmailCONTENT_URI,	null, EmailCONTACT_ID+ " = ?", new String[] { contact_id }, null);
-
-                    while (emailCursor.moveToNext()) {
-
-                        email = emailCursor.getString(emailCursor.getColumnIndex(DATA));
-
-                        output.append("\nEmail:" + email);
-
-                    }
-
-                    emailCursor.close();
-                }
-
-                output.append("\n");
+                }while(cursor.moveToNext());
             }
+            return mMatrixCursor;
+        }
 
-
-            //outputText.setText("hey: " + output.toString() + ":::");
+        @Override
+        protected void onPostExecute(Cursor result) {
+            // Setting the cursor containing contacts to listview
+            mAdapter.swapCursor(result);
         }
     }
 
+    private class EndlessScrollListener implements AbsListView.OnScrollListener {
+
+        private int visibleThreshold = 5;
+        private int currentPage = 0;
+        private int previousTotal = 0;
+        private boolean loading = true;
+
+        public EndlessScrollListener() {
+        }
+        public EndlessScrollListener(int visibleThreshold) {
+            this.visibleThreshold = visibleThreshold;
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                             int visibleItemCount, int totalItemCount) {
+            if (loading) {
+                if (totalItemCount > previousTotal) {
+                    loading = false;
+                    previousTotal = totalItemCount;
+                    currentPage++;
+                }
+            }
+            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+                // I load the next page of gigs using a background task,
+                // but you can call any function here.
+                mLoader.execute();
+                loading = true;
+            }
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) { }
+    }
 }

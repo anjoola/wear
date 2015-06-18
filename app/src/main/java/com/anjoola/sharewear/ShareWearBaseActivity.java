@@ -10,30 +10,28 @@ import android.os.Bundle;
  */
 public class ShareWearBaseActivity extends Activity {
     // Preferences objects.
-    SharedPreferences pref;
-    SharedPreferences.Editor prefEditor;
-
-    public final static String SIGN_OUT = "SIGN_OUT";
+    SharedPreferences mPref;
+    SharedPreferences.Editor mPrefEditor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pref = getPreferences(Context.MODE_PRIVATE);
-        prefEditor = pref.edit();
+        mPref = getPreferences(Context.MODE_PRIVATE);
+        mPrefEditor = mPref.edit();
     }
 
     public String prefGetUser() {
-        return pref.getString(getString(R.string.pref_user), null);
+        return mPref.getString(getString(R.string.pref_user), null);
     }
 
     public void prefSetUser(String user) {
         if (user != null) {
-            prefEditor.putString(getString(R.string.pref_user), user);
+            mPrefEditor.putString(getString(R.string.pref_user), user);
         }
         else {
-            prefEditor.remove(getString(R.string.pref_user));
+            mPrefEditor.remove(getString(R.string.pref_user));
         }
-        prefEditor.commit();
+        mPrefEditor.commit();
     }
 }
