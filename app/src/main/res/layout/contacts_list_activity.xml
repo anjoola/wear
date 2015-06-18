@@ -14,15 +14,12 @@
         android:padding="2dip"
         android:layout_gravity="center_horizontal">
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dip"
-            android:enabled="false"
-            android:layout_gravity="center_horizontal"
-            />
-
     </LinearLayout>
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ratingBar"
+        android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

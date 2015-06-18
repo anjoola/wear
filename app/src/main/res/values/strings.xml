@@ -4,7 +4,6 @@
 
     <!-- Standard -->
     <string name="app_name">ShareWear</string>
-    <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="close">Close</string>
 
@@ -13,5 +12,8 @@
 
     <!-- Error messages -->
     <string name="play_services_error">Google Play Services is not available. This application will close.</string>
+
+    <!-- Preferences -->
+    <string name="pref_user">pref_user</string>
 
 </resources>
