@@ -4,6 +4,8 @@
 
     <!-- Standard -->
     <string name="app_name">ShareWear</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="location">Share Location</string>
     <string name="search">Search</string>
     <string name="sign_out">Sign Out</string>
     <string name="close">Close</string>
