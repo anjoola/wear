@@ -11,29 +11,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="2dip">
+        android:padding="2dip"
+        android:layout_gravity="center_horizontal">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/sign_in_button"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dip"
-            android:enabled="false" />
-
-        <Button
-            android:id="@+id/sign_out_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sign_out_button_name"
-            android:enabled="false" />
+            android:enabled="false"
+            android:layout_gravity="center_horizontal"
+            />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/sign_in_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dip"
-        android:text="@string/status_signed_out" />
-    
 </LinearLayout>

@@ -73,28 +73,23 @@ public class ShareWearActivity extends Activity implements
         }
 
         // Initialize Google API client.
-        mGoogleApiClient = buildGoogleApiClient();
+        getOrSetGoogleApiClient();
+    }
+
+    protected void getOrSetGoogleApiClient() {
+        ShareWearApplication mApp =
+                ((ShareWearApplication) getApplicationContext());
+        if (mApp.getGoogleApiClient() == null) {
+            mGoogleApiClient = buildGoogleApiClient();
+            mApp.setGoogleApiClient(mGoogleApiClient);
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SAVED_PROGRESS, mSignInProgress);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
     }
 
     @Override
