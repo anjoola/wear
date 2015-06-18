@@ -1,5 +1,6 @@
 package com.anjoola.sharewear;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
@@ -9,6 +10,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -16,7 +20,11 @@ import android.widget.SimpleCursorAdapter;
 import java.io.File;
 import java.io.FileOutputStream;
 
-public class ContactsListActivity extends ShareWearActivity {
+public class ContactsListActivity extends ShareWearActivity implements
+        View.OnClickListener {
+    // Floating action button for getting current location.
+    android.support.design.widget.FloatingActionButton mFab;
+
     // ListView to store all contacts.
     private ListView mContactsList;
 
@@ -35,6 +43,11 @@ public class ContactsListActivity extends ShareWearActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_list_activity);
 
+        // Set up handler for getting current location floating action button.
+        mFab = (android.support.design.widget.FloatingActionButton)
+                findViewById(R.id.fab_my_location);
+        mFab.setOnClickListener(this);
+
         // Set up contacts list view. Set adapter and scroll listener for
         // infinite scrolling.
         mContactsList = (ListView) findViewById(R.id.contacts_list);
@@ -52,6 +65,32 @@ public class ContactsListActivity extends ShareWearActivity {
         // Set up asynchronous task and start it.
         mLoader = new ContactsListLoader(0);
         mLoader.execute();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab_my_location) {
+            Intent intent = new Intent(this, MyLocationActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.contacts_list_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // TODO other action
+            case R.id.action_sign_out:
+                signOut();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /** An AsyncTask class to retrieve and load listview with contacts */
@@ -173,6 +212,7 @@ public class ContactsListActivity extends ShareWearActivity {
         }
     }
 
+    // TODO, doesn't work
     private class EndlessScrollListener implements AbsListView.OnScrollListener {
         // Offset loaded.
         private int offset = 0;

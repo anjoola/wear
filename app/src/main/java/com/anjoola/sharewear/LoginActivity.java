@@ -143,7 +143,8 @@ public class LoginActivity extends ShareWearBaseActivity implements
 
     @Override
     public void onClick(View v) {
-        signIn();
+        if (v.getId() == R.id.sign_in_button)
+            signIn();
     }
 
     @Override
