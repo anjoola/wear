@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Displays user's current location and location history. Allows user to
+ * initiate location sharing with their contacts.
+ */
 public class MyLocationActivity extends ShareWearActivity implements
         LocationListener, View.OnClickListener {
     // Floating action button for sharing location.
@@ -35,7 +39,7 @@ public class MyLocationActivity extends ShareWearActivity implements
     private Location mOldLocation;
 
     // Minimum update time for location updates.
-    private final long UPDATE_TIME = 1000;
+    private final long UPDATE_TIME = 30000;
 
     // Utility for drawing location history on the map.
     private LocationHistoryUtil mLocationHistoryUtil;
@@ -114,17 +118,17 @@ public class MyLocationActivity extends ShareWearActivity implements
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        // TODO
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
+        // TODO
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        // TODO warning about GPS disabled
     }
 
     /**

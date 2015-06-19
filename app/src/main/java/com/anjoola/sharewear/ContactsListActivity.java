@@ -20,6 +20,10 @@ import android.widget.SimpleCursorAdapter;
 import java.io.File;
 import java.io.FileOutputStream;
 
+/**
+ * Displays list of contacts and favorites. Allows user to add and search
+ * for contacts. Floating action button allows user to share their location.
+ */
 public class ContactsListActivity extends ShareWearActivity implements
         View.OnClickListener {
     // Floating action button for getting current location.

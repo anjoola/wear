@@ -3,7 +3,6 @@ package com.anjoola.sharewear;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -23,12 +22,18 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO
+/**
+ * Utilities for displaying location history on a map.
+ */
 public class LocationHistoryUtil {
-    // JSON string used for requests to the Google Maps API.
-    private String GOOGLE_MAPS_JSON_STRING =
-            "http://maps.googleapis.com/maps/api/directions/json?origin=%f,%f" +
-            "&destination=%f,%f&sensor=false&mode=walking&alternatives=true";
+    // Color of line to draw on map.
+    private int LINE_COLOR = Color.BLUE;
+
+    // Width of line to draw on map.
+    private int LINE_WIDTH = 20;
+
+    // Threshold distance (in km) for drawing a line.
+    private double DRAWING_THRESHOLD = 0.1;
 
     // Corresponding Google Map to draw paths on.
     private GoogleMap mMap;
@@ -46,12 +51,49 @@ public class LocationHistoryUtil {
      * @param newLoc New location.
      */
     public void updatePath(Location oldLoc, Location newLoc) {
-        // TODO if within some threshold, don't draw path
+        // Don't draw path if distance isn't great enough.
+        if (!isWithinThreshold(oldLoc, newLoc)) {
+            return;
+        }
+
+        // JSON string used for requests to the Google Maps API.
+        final String GOOGLE_MAPS_JSON_STRING =
+                "http://maps.googleapis.com/maps/api/directions/json" +
+                "?origin=%f,%f&destination=%f,%f&sensor=false&mode=walking" +
+                "&alternatives=true";
         String url = String.format(GOOGLE_MAPS_JSON_STRING,
                 oldLoc.getLatitude(), oldLoc.getLongitude(),
                 newLoc.getLatitude(), newLoc.getLongitude());
-        DrawPathAsync task = new DrawPathAsync(url);
+        DrawPathAsync task = new DrawPathAsync(url, oldLoc, newLoc);
         task.execute();
+    }
+
+    /**
+     * Checks to see if the distance between two locations is big enough for
+     * a line to be drawn between them. Uses the Haversine formula (which tends
+     * to overestimate trans-polar distances and underestimates trans-equatorial
+     * distances.
+     *
+     * @param oldLoc The old location.
+     * @param newLoc The new location.
+     * @return Whether or not the distance is great enough.
+     */
+    private boolean isWithinThreshold(Location oldLoc, Location newLoc) {
+        final double RADIUS_OF_EARTH = 6367.445;
+
+        double dLng = newLoc.getLongitude() - oldLoc.getLongitude();
+        double dLat = newLoc.getLatitude() - oldLoc.getLatitude();
+
+        double sinLat = Math.sin(dLat / 2);
+        sinLat *= sinLat;
+        double sinLng = Math.sin(dLng / 2);
+        sinLng *= sinLng;
+        double a = sinLat + Math.cos(oldLoc.getLatitude()) *
+                Math.cos(newLoc.getLatitude()) * sinLng;
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = RADIUS_OF_EARTH * c;
+
+        return distance >= DRAWING_THRESHOLD;
     }
 
     /**
@@ -61,33 +103,32 @@ public class LocationHistoryUtil {
      * @return List of points necessary to draw the line.
      */
     private List<LatLng> decodePoly(String encoded) {
-        // TODO comment
         List<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
+        double lat = 0, lng = 0;
 
         while (index < len) {
             int b, shift = 0, result = 0;
+            // Decode latitude.
             do {
                 b = encoded.charAt(index++) - 63;
                 result |= (b & 0x1f) << shift;
                 shift += 5;
             } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
+            int dLat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dLat;
 
-            shift = 0;
-            result = 0;
+            // Decode longitude.
+            shift = 0; result = 0;
             do {
                 b = encoded.charAt(index++) - 63;
                 result |= (b & 0x1f) << shift;
                 shift += 5;
             } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
+            int dLng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dLng;
 
-            LatLng p = new LatLng( (((double) lat / 1E5)),
-                    (((double) lng / 1E5) ));
+            LatLng p = new LatLng(lat / 1E5, lng / 1E5);
             poly.add(p);
         }
 
@@ -98,8 +139,11 @@ public class LocationHistoryUtil {
      * Draws a path between two points, based on input from the Google API.
      *
      * @param result String returned from the Google Directions API.
+     * @param oldLoc Old location.
+     * @param newLoc New location.
      */
-    public void drawPath(String result) {
+    public void drawPath(String result, Location oldLoc, Location newLoc) {
+        boolean drewPath = false;
         try {
             // Transform the string into a JSON object.
             final JSONObject json = new JSONObject(result);
@@ -111,24 +155,37 @@ public class LocationHistoryUtil {
 
             // Loop through each point to draw.
             for (int z = 0; z < list.size() - 1; z++) {
-                Log.e("------", "STUPID");
                 LatLng source = list.get(z);
                 LatLng dest = list.get(z + 1);
                 mMap.addPolyline(new PolylineOptions()
-                        .add(new LatLng(source.latitude, source.longitude), new LatLng(dest.latitude, dest.longitude))
-                        .width(2)
-                        .color(Color.BLUE).geodesic(true));
+                        .add(source, dest)
+                       // .add(new LatLng(source.latitude, source.longitude), new LatLng(dest.latitude, dest.longitude))
+                        .width(LINE_WIDTH)
+                        .color(LINE_COLOR).geodesic(true));
+                drewPath = true;
             }
-
         } catch (JSONException e) { }
+
+        // If Google Maps could not draw a path, we draw our own.
+        if (!drewPath) {
+            LatLng source = new LatLng(oldLoc.getLatitude(), oldLoc.getLongitude());
+            LatLng dest = new LatLng(newLoc.getLatitude(), newLoc.getLongitude());
+            mMap.addPolyline(new PolylineOptions().add(source, dest)
+                    .width(LINE_WIDTH).color(LINE_COLOR).geodesic(true));
+        }
     }
 
-    // TODO
+    /**
+     * Asynchronously draw paths on the map.
+     */
     private class DrawPathAsync extends AsyncTask<Void, Void, String> {
+        Location oldLoc, newLoc;
         String url;
 
-        public DrawPathAsync(String url){
+        public DrawPathAsync(String url, Location oldLoc, Location newLoc){
             this.url = url;
+            this.oldLoc = oldLoc;
+            this.newLoc = newLoc;
         }
 
         @Override
@@ -140,14 +197,15 @@ public class LocationHistoryUtil {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result != null) {
-                drawPath(result);
+                drawPath(result, oldLoc, newLoc);
             }
         }
 
         /**
-         * TODO
-         * @param url
-         * @return
+         * Get JSON results from the Google Maps API.
+         *
+         * @param url URL to query.
+         * @return String containing the JSON results.
          */
         private String getJsonFromUrl(String url) {
             InputStream inputStream = null;
