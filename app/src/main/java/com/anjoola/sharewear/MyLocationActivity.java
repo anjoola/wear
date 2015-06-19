@@ -1,6 +1,5 @@
 package com.anjoola.sharewear;
 
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -14,19 +13,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,13 +31,14 @@ public class MyLocationActivity extends ShareWearActivity implements
     private TextView mLocationDetails;
     private TextView mLocationLatLng;
 
-    // TODO
-    private final String GOOGLE_MAPS_JSON_STRING =
-            "http://maps.googleapis.com/maps/api/directions/json?origin=$1,$2" +
-            "&destination=$3,$4&sensor=false&mode=driving&alternatives=true";
+    // Previous location.
+    private Location mOldLocation;
 
     // Minimum update time for location updates.
-    private final long UPDATE_TIME = 20000;
+    private final long UPDATE_TIME = 1000;
+
+    // Utility for drawing location history on the map.
+    private LocationHistoryUtil mLocationHistoryUtil;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +47,7 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         mLocationDetails = (TextView) findViewById(R.id.location_details);
         mLocationLatLng = (TextView) findViewById(R.id.location_latlng);
+        mOldLocation = null;
 
         // Set up handler for floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
@@ -67,7 +60,8 @@ public class MyLocationActivity extends ShareWearActivity implements
         mMap = supportMapFragment.getMap();
         mMap.setMyLocationEnabled(true);
 
-        // Get most recent location.
+        // Get most recent location and start location history.
+        mLocationHistoryUtil = new LocationHistoryUtil(mMap);
         getLocation();
     }
 
@@ -102,13 +96,20 @@ public class MyLocationActivity extends ShareWearActivity implements
         double lng = location.getLongitude();
         LatLng latLng = new LatLng(lat, lng);
 
-        mMap.addMarker(new MarkerOptions().position(latLng));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        // TODO marker
+        //mMap.addMarker(new MarkerOptions().position(latLng));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         // Update text fields.
         mLocationDetails.setText(formatLocationDetails(lat, lng));
         mLocationLatLng.setText(String.format("(%1$.3f, %2$.3f)", lat, lng));
+
+        // Draw path between old and new locations.
+        if (mOldLocation != null) {
+            mLocationHistoryUtil.updatePath(mOldLocation, location);
+        }
+        mOldLocation = location;
     }
 
     @Override
@@ -124,75 +125,6 @@ public class MyLocationActivity extends ShareWearActivity implements
     @Override
     public void onProviderDisabled(String provider) {
 
-    }
-
-    /**
-     * Decodes a string containing the details for drawing a polyline.
-     *
-     * @param encoded The encoded string for a polyline.
-     * @return List of points necessary to draw the line.
-     */
-    private List<LatLng> decodePoly(String encoded) {
-        // TODO comment
-        List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
-
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
-
-            LatLng p = new LatLng( (((double) lat / 1E5)),
-                    (((double) lng / 1E5) ));
-            poly.add(p);
-        }
-
-        return poly;
-    }
-
-    /**
-     * Draws a path between two points, based on input from the Google API.
-     *
-     * @param result String returned from the Google Directions API.
-     */
-    public void drawPath(String result) {
-        try {
-            // Transform the string into a JSON object.
-            final JSONObject json = new JSONObject(result);
-            JSONArray routeArray = json.getJSONArray("routes");
-            JSONObject routes = routeArray.getJSONObject(0);
-            JSONObject polylines = routes.getJSONObject("overview_polyline");
-            String encodedString = polylines.getString("points");
-            List<LatLng> list = decodePoly(encodedString);
-
-            // Loop through each point to draw.
-            for (int z = 0; z < list.size() - 1; z++) {
-                LatLng source = list.get(z);
-                LatLng dest = list.get(z + 1);
-                mMap.addPolyline(new PolylineOptions()
-                        .add(source, dest)
-                        //.add(new LatLng(source.latitude, source.longitude), new LatLng(dest.latitude, dest.longitude))
-                        .width(2)
-                        .color(Color.BLUE).geodesic(true));
-            }
-
-        } catch (JSONException e) { }
     }
 
     /**
@@ -223,13 +155,6 @@ public class MyLocationActivity extends ShareWearActivity implements
         } catch (IOException e) { }
 
         return string.toString();
-    }
-
-    private String getGoogleMapsJsonUrl(double sourceLat, double sourceLng,
-                                        double destLat, double destLng) {
-
-        return String.format(GOOGLE_MAPS_JSON_STRING, sourceLat, sourceLng,
-                destLat, destLng).toString();
     }
 
     /**
