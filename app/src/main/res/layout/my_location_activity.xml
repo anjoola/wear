@@ -28,42 +28,40 @@
         android:layout_height="100dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:background="@android:color/white"
-        android:elevation="6dp"
+        android:elevation="4dp"
         android:id="@+id/location_info"
         android:layout_alignParentBottom="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Not Sharing Location"
             android:id="@+id/sharing_status"
-            />
+            android:textColor="#ff2b2b2b"
+            android:textSize="24sp"/>
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Small Text"
             android:id="@+id/location_details"
-            android:paddingTop="10dp"/>
+            android:paddingTop="3dp"
+            android:textColor="#ff848484"
+            android:textSize="14sp"
+            android:ellipsize="marquee"
+            android:maxLines="1"/>
 
         <TextView
-            android:id="@+id/latlongLocation"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:background="#ff058fff"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:textColor="#ffffffff"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:elevation="2dp"/>
+            android:text="(Lat, Lng)"
+            android:id="@+id/location_latlng"
+            android:textColor="#ff848484"
+            android:textSize="14sp"
+            />
 
     </LinearLayout>
 
@@ -73,14 +71,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="-20dp"
         android:layout_marginRight="16dp"
         app:borderWidth="0dp"
-        app:elevation="6dp"
+        app:elevation="5dp"
         app:pressedTranslationZ="12dp"
         app:fabSize="normal"
         app:backgroundTint="#FF4081"
         app:rippleColor="#ffffbabf"
-        android:layout_above="@+id/location_info"/>
+        android:layout_alignTop="@+id/location_info"
+        android:layout_marginTop="-28dp"/>
 
 </RelativeLayout>

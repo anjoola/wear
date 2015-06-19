@@ -4,14 +4,19 @@
 
     <!-- Standard -->
     <string name="app_name">ShareWear</string>
-    <string name="add_contact">Add Contact</string>
-    <string name="location">Share Location</string>
-    <string name="search">Search</string>
     <string name="sign_out">Sign Out</string>
     <string name="close">Close</string>
 
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
+
+    <!-- ContactsListActivity -->
+    <string name="add_contact">Add Contact</string>
+    <string name="search">Search</string>
+
+    <!-- MyLocationActivity -->
+    <string name="share_my_location">Share My Location</string>
+    <string name="location">Share Location</string>
 
     <!-- Error messages -->
     <string name="play_services_error">Google Play Services is not available. This application will close.</string>
