@@ -84,7 +84,12 @@ public class ContactsListActivity extends ShareWearActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // TODO other action
+            case R.id.action_add:
+                // TODO
+                return true;
+            case R.id.action_search:
+                // TODO
+                return true;
             case R.id.action_sign_out:
                 signOut();
                 return true;

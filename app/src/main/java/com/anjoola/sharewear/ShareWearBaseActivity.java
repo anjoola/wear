@@ -1,14 +1,14 @@
 package com.anjoola.sharewear;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Base activity. Contains the code needed for global preferences.
  */
-public class ShareWearBaseActivity extends Activity {
+public class ShareWearBaseActivity extends FragmentActivity {
     // Preferences objects.
     SharedPreferences mPref;
     SharedPreferences.Editor mPrefEditor;
