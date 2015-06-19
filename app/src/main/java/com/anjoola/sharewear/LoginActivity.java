@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -64,11 +65,20 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // Used to connect to Google Play Services and allow Google+ sign in.
     private GoogleApiClient mGoogleApiClient;
 
+    // Title TextView.
+    TextView title;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+
+        // Set font for title.
+        title = (TextView) findViewById(R.id.sharewear_title);
+        Typeface typeface = Typeface.createFromAsset(getAssets(),
+                "fonts/OleoScriptSwashCaps-Regular.ttf");
+        title.setTypeface(typeface);
 
         // Initialize Google API client.
         mGoogleApiClient = buildGoogleApiClient();

@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:windowActionBar="false"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dip">
+    android:layout_height="fill_parent"
+    android:padding="30dp"
+    android:background="#ff79ccbe"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/app_name"
+        android:id="@+id/sharewear_title"
+        android:textSize="50sp"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:gravity="center_horizontal|top"
+        android:layout_gravity="top"
+        android:layout_alignParentTop="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/intro_image"
+        android:src="@mipmap/ic_intro_picture"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_margin="30dp" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="2dip"
-        android:layout_gravity="center_horizontal">
+        android:gravity="center_horizontal|bottom"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/sign_in_button"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dip"
-            android:enabled="false"
-            android:layout_gravity="center_horizontal"
-            />
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp" />
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
