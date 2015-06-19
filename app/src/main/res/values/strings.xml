@@ -2,21 +2,38 @@
 
 <resources>
 
-    <!-- Standard -->
     <string name="app_name">ShareWear</string>
-    <string name="sign_out">Sign Out</string>
+
+    <!-- Actions -->
+    <string name="add_contact">Add Contact</string>
+    <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="search">Search</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="share">Share</string>
+    <string name="turn_on">Turn On</string>
 
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
 
     <!-- ContactsListActivity -->
-    <string name="add_contact">Add Contact</string>
-    <string name="search">Search</string>
+    <string name="nfc_prompt_title">Turn on NFC?</string>
+    <string name="nfc_prompt">NFC is needed to exchange information.</string>
 
     <!-- MyLocationActivity -->
+    <string name="not_sharing_location">Currently Not Sharing</string>
+    <string name="sharing_location">Now Sharing Location</string>
     <string name="share_my_location">Share My Location</string>
-    <string name="location">Share Location</string>
+    <string name="sharing_off_toast">Location sharing has been turned off</string>
+    <string name="sharing_on_toast">Location sharing started.</string>
+
+    <string name="start_sharing_prompt_title">Start sharing location?</string>
+    <string name="start_sharing_prompt">
+        Your location history will be shared with all contacts for the next 15 minutes or until
+        you stop sharing.
+    </string>
+    <string name="gps_prompt_title">Turn on GPS?</string>
+    <string name="gps_prompt">GPS is needed to share your location.</string>
 
     <!-- Error messages -->
     <string name="play_services_error">Google Play Services is not available. This application will close.</string>

@@ -157,11 +157,8 @@ public class LocationHistoryUtil {
             for (int z = 0; z < list.size() - 1; z++) {
                 LatLng source = list.get(z);
                 LatLng dest = list.get(z + 1);
-                mMap.addPolyline(new PolylineOptions()
-                        .add(source, dest)
-                       // .add(new LatLng(source.latitude, source.longitude), new LatLng(dest.latitude, dest.longitude))
-                        .width(LINE_WIDTH)
-                        .color(LINE_COLOR).geodesic(true));
+                mMap.addPolyline(new PolylineOptions().add(source, dest)
+                        .width(LINE_WIDTH).color(LINE_COLOR).geodesic(true));
                 drewPath = true;
             }
         } catch (JSONException e) { }

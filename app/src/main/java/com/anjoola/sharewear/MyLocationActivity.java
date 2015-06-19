@@ -1,5 +1,7 @@
 package com.anjoola.sharewear;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,8 +33,13 @@ public class MyLocationActivity extends ShareWearActivity implements
     // Floating action button for sharing location.
     private android.support.design.widget.FloatingActionButton mFab;
 
+    // Handlers for getting location.
+    LocationManager mLocManager;
+    String mProvider;
+
     // Google Map to display current location.
     private GoogleMap mMap;
+    private TextView mLocationTitle;
     private TextView mLocationDetails;
     private TextView mLocationLatLng;
 
@@ -40,18 +48,33 @@ public class MyLocationActivity extends ShareWearActivity implements
 
     // Minimum update time for location updates.
     private final long UPDATE_TIME = 30000;
+    private final long SLOW_UPDATE_TIME = 300000;
 
     // Utility for drawing location history on the map.
     private LocationHistoryUtil mLocationHistoryUtil;
+
+    // Application for global state.
+    private ShareWearApplication mApp;
+
+    // Prompts.
+    private AlertDialog mShareLocationDialog, mGpsDialog;
+    private Toast mShareOnToast, mShareOffToast;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_location_activity);
 
+        // Initialize objects.
+        mLocationTitle = (TextView) findViewById(R.id.sharing_status);
         mLocationDetails = (TextView) findViewById(R.id.location_details);
         mLocationLatLng = (TextView) findViewById(R.id.location_latlng);
         mOldLocation = null;
+        mApp = (ShareWearApplication) getApplication();
+        mShareLocationDialog = null;
+        mGpsDialog = null;
+        mShareOnToast = null;
+        mShareOffToast = null;
 
         // Set up handler for floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
@@ -59,20 +82,39 @@ public class MyLocationActivity extends ShareWearActivity implements
         mFab.setOnClickListener(this);
 
         // Set up handlers for getting location on map.
+        // TODO maybe this throws an error?
+        mLocManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        mProvider = mLocManager.getBestProvider(criteria, true);
+
+        // Google Maps fragment.
         SupportMapFragment supportMapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.google_map);
         mMap = supportMapFragment.getMap();
         mMap.setMyLocationEnabled(true);
 
-        // Get most recent location and start location history.
         mLocationHistoryUtil = new LocationHistoryUtil(mMap);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Get location again each time they open the app.
         getLocation();
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fab_share) {
-            // TODO
+            // Location sharing is on, turn it off.
+            if (mApp.isLocationSharingOn())
+                turnLocationSharingOff();
+
+            // Location sharing is off, prompt the user to see if they want it
+            // turned on.
+            else
+                promptUserShareLocation();
         }
     }
 
@@ -102,7 +144,7 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         // TODO marker
         //mMap.addMarker(new MarkerOptions().position(latLng));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         // Update text fields.
@@ -117,17 +159,17 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onStatusChanged(String mProvider, int status, Bundle extras) {
         // TODO
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(String mProvider) {
         // TODO
     }
 
     @Override
-    public void onProviderDisabled(String provider) {
+    public void onProviderDisabled(String mProvider) {
         // TODO warning about GPS disabled
     }
 
@@ -166,13 +208,8 @@ public class MyLocationActivity extends ShareWearActivity implements
      * turned off.
      */
     private void getLocation() {
-        LocationManager locationManager =
-                (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String provider = locationManager.getBestProvider(criteria, true);
-
         // Get most recent location.
-        Location location = locationManager.getLastKnownLocation(provider);
+        Location location = mLocManager.getLastKnownLocation(mProvider);
 
         // Could not get location. Is GPS turned off?
         if (location == null) {
@@ -182,6 +219,76 @@ public class MyLocationActivity extends ShareWearActivity implements
         else {
             onLocationChanged(location);
         }
-        locationManager.requestLocationUpdates(provider, UPDATE_TIME, 0, this);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+    }
+
+    /**
+     * Prompt the user about location sharing (do they want to turn it on).
+     * If so, turn on location sharing. If not, do nothing.
+     */
+    private void promptUserShareLocation() {
+        // Create the dialog if it hasn't been created yet.
+        if (mShareLocationDialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set "Share" and "Cancel" buttons.
+            builder.setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    turnLocationSharingOn();
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) { }
+            });
+
+            builder.setTitle(R.string.start_sharing_prompt_title);
+            builder.setMessage(R.string.start_sharing_prompt);
+            mShareLocationDialog = builder.create();
+        }
+        mShareLocationDialog.show();
+    }
+
+    /**
+     * Turn location sharing off.
+     */
+    private void turnLocationSharingOff() {
+        // Update UI.
+        mFab.setImageResource(R.mipmap.ic_action_share);
+        mLocationTitle.setText(R.string.not_sharing_location);
+        mMap.clear();
+
+        // Change to lower location-update frequency.
+        mApp.setLocationSharingOn(false);
+        mLocManager.removeUpdates(this);
+        mLocManager.requestLocationUpdates(mProvider, SLOW_UPDATE_TIME, 0, this);
+
+        // Show toast.
+        if (mShareOffToast == null) {
+            mShareOffToast = Toast.makeText(this, R.string.sharing_off_toast,
+                    Toast.LENGTH_SHORT);
+        }
+        mShareOffToast.show();
+    }
+
+    /**
+     * Turn location sharing on.
+     */
+    private void turnLocationSharingOn() {
+        // Update UI.
+        mFab.setImageResource(R.mipmap.ic_action_location_off);
+        mLocationTitle.setText(R.string.sharing_location);
+
+        // Change to higher location-update frequency.
+        mApp.setLocationSharingOn(true);
+        mLocManager.removeUpdates(this);
+        mLocManager.requestLocationUpdates(mProvider, UPDATE_TIME, 0, this);
+        getLocation();
+
+        // Show toast.
+        if (mShareOnToast == null) {
+            mShareOnToast = Toast.makeText(this, R.string.sharing_on_toast,
+                    Toast.LENGTH_SHORT);
+        }
+        mShareOnToast.show();
     }
 }

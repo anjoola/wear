@@ -38,7 +38,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Not Sharing Location"
+            android:text="@string/not_sharing_location"
             android:id="@+id/sharing_status"
             android:textColor="#ff2b2b2b"
             android:textSize="24sp"/>
@@ -46,7 +46,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Small Text"
+            android:text="Street, City, State"
             android:id="@+id/location_details"
             android:paddingTop="3dp"
             android:textColor="#ff848484"
