@@ -20,6 +20,11 @@
     <string name="nfc_prompt_title">Turn on NFC?</string>
     <string name="nfc_prompt">NFC is needed to exchange information.</string>
 
+    <!-- ContactAddNFCActivity -->
+    <string name="nfc_description">
+        Use NFC to exchange your contact information with someone else. Tap your phones together.
+    </string>
+
     <!-- MyLocationActivity -->
     <string name="not_sharing_location">Currently Not Sharing</string>
     <string name="sharing_location">Now Sharing Location</string>
