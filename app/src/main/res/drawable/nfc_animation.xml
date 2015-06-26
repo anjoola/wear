@@ -1,0 +1,11 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+                android:oneshot="false">
+    <item android:drawable="@mipmap/ic_nfc_1" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_2" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_3" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_4" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_5" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_6" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_7" android:duration="100" />
+    <item android:drawable="@mipmap/ic_nfc_8" android:duration="2000" />
+</animation-list>

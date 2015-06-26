@@ -12,18 +12,19 @@
     android:paddingRight="30dp">
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/nfc_image"
-        android:src="@mipmap/ic_nfc_8"
+        android:src="@mipmap/ic_nfc_0"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false"
-        android:paddingBottom="30dp"/>
+        />
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/nfc_description"
-        android:id="@+id/nfc_description" />
+        android:id="@+id/nfc_description"
+        android:paddingTop="30dp"/>
 
 </LinearLayout>
