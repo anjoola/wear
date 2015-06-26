@@ -24,7 +24,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/nfc_description"
-        android:id="@+id/nfc_description"
-        android:layout_toEndOf="nfc_image"/>
+        android:id="@+id/nfc_description" />
 
 </LinearLayout>

@@ -89,7 +89,8 @@ public class ContactsListActivity extends ShareWearActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                // TODO
+                Intent intent = new Intent(this, ContactAddNFCActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_search:
                 // TODO

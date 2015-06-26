@@ -17,13 +17,13 @@
     <string name="sign_in_button_text">Sign In with Google+</string>
 
     <!-- ContactsListActivity -->
-    <string name="nfc_prompt_title">Turn on NFC?</string>
-    <string name="nfc_prompt">NFC is needed to exchange information.</string>
 
     <!-- ContactAddNFCActivity -->
     <string name="nfc_description">
         Use NFC to exchange your contact information with someone else. Tap your phones together.
     </string>
+    <string name="nfc_prompt_title">Turn on NFC?</string>
+    <string name="nfc_prompt">This must be turned on to exchange information via NFC.</string>
 
     <!-- MyLocationActivity -->
     <string name="not_sharing_location">Currently Not Sharing</string>
@@ -41,7 +41,9 @@
     <string name="gps_prompt">GPS is needed to share your location.</string>
 
     <!-- Error messages -->
-    <string name="play_services_error">Google Play Services is not available. This application will close.</string>
+    <string name="play_services_error">
+        Google Play Services is not available. This application will close.
+    </string>
 
     <!-- Preferences -->
     <string name="pref_user">pref_user</string>
