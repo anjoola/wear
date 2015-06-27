@@ -4,7 +4,7 @@
 
     <item android:id="@+id/action_add"
           android:icon="@mipmap/ic_check"
-          android:title="@string/add_contact"
+          android:title="@string/save"
           android:showAsAction="always" />
 
     <item android:id="@+id/action_sign_out"

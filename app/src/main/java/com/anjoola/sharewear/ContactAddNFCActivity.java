@@ -10,13 +10,16 @@ import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 /**
  * Activity to exchange contact information over NFC. Can switch to manual
  * input if NFC is not turned on or not desired.
  */
-public class ContactAddNFCActivity extends ShareWearActivity {
+public class ContactAddNFCActivity extends ShareWearActivity implements
+        View.OnClickListener {
     // Animation for NFC.
     AnimationDrawable animation;
 
@@ -27,6 +30,9 @@ public class ContactAddNFCActivity extends ShareWearActivity {
     // Prompt for turning on NFC.
     private AlertDialog mNfcDialog;
 
+    // Button for switching to manual input.
+    Button mSwitchButton;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +40,8 @@ public class ContactAddNFCActivity extends ShareWearActivity {
 
         // Initialize objects.
         mNfcDialog = null;
+        mSwitchButton = (Button) findViewById(R.id.manual_input_button);
+        mSwitchButton.setOnClickListener(this);
 
         // Get NFC manager and adapter.
         mNfcManager = (NfcManager) this.getApplicationContext()
@@ -47,15 +55,10 @@ public class ContactAddNFCActivity extends ShareWearActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Check NFC status each time.
-        checkNFCStatus();
-    }
-
-    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        // Check NFC status each time.
+        checkNFCStatus();
 
         if (hasFocus)
             animation.start();
@@ -79,6 +82,14 @@ public class ContactAddNFCActivity extends ShareWearActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.manual_input_button) {
+            toManualInputActivity();
+        }
+    }
+
 
     /**
      * Checks if NFC is turned on. If not, prompt the user to turn it on.
@@ -108,10 +119,7 @@ public class ContactAddNFCActivity extends ShareWearActivity {
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // Switch to manual input.
-                    //Intent intent = new Intent(this, ContactAddActivity.class);
-                    //startActivity(intent);
-                    // TODO
-
+                    toManualInputActivity();
                 }
             });
 
@@ -122,5 +130,14 @@ public class ContactAddNFCActivity extends ShareWearActivity {
             mNfcDialog.setCanceledOnTouchOutside(false);
         }
         mNfcDialog.show();
+    }
+
+    /**
+     * Switch to the manual input activity.
+     */
+    private void toManualInputActivity() {
+        Intent intent = new Intent(this, ContactAddActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
     }
 }

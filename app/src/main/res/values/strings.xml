@@ -11,6 +11,7 @@
     <string name="search">Search</string>
     <string name="sign_out">Sign Out</string>
     <string name="share">Share</string>
+    <string name="save">Save</string>
     <string name="go_to_settings">Go to Settings</string>
 
     <!-- LoginActivity -->
@@ -27,6 +28,12 @@
         NFC must be turned on in order to exchange contact information. Turn it on in Settings.
     </string>
     <string name="switch_to_manual">Switch to Manual Input</string>
+
+    <!-- ContactAddActivity -->
+    <string name="input_name">Name</string>
+    <string name="input_phone">Phone</string>
+    <string name="input_email">Email</string>
+    <string name="switch_to_nfc">Switch to NFC Input</string>
 
     <!-- MyLocationActivity -->
     <string name="not_sharing_location">Currently Not Sharing</string>
