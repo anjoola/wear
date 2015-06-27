@@ -2,6 +2,7 @@ package com.anjoola.sharewear;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +67,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_location_activity);
 
-        // Initialize objects.
+        // Initialize objects, toasts, and dialogs.
         mLocationTitle = (TextView) findViewById(R.id.sharing_status);
         mLocationDetails = (TextView) findViewById(R.id.location_details);
         mLocationLatLng = (TextView) findViewById(R.id.location_latlng);
@@ -82,10 +84,8 @@ public class MyLocationActivity extends ShareWearActivity implements
         mFab.setOnClickListener(this);
 
         // Set up handlers for getting location on map.
-        // TODO maybe this throws an error?
         mLocManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        mProvider = mLocManager.getBestProvider(criteria, true);
+        mProvider = null;
 
         // Google Maps fragment.
         SupportMapFragment supportMapFragment = (SupportMapFragment)
@@ -97,11 +97,12 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
 
-        // Get location again each time they open the app.
-        getLocation();
+        // Get location each time user focuses on app.
+        if (hasFocus)
+            checkGPSStatus();
     }
 
     @Override
@@ -144,8 +145,7 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         // TODO marker
         //mMap.addMarker(new MarkerOptions().position(latLng));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
 
         // Update text fields.
         mLocationDetails.setText(formatLocationDetails(lat, lng));
@@ -204,22 +204,66 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     /**
+     * Check the GPS status and prompt the user to turn it on if it is off.
+     * Otherwise, get the current location. Also update the UI if needed
+     * depending on location sharing status.
+     */
+    private void checkGPSStatus() {
+        updateUI(mApp.isLocationSharingOn());
+
+        // GPS is turned off.
+        if (!mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            promptUserGPSEnable();
+        }
+        else {
+            getLocation();
+        }
+    }
+
+    /**
      * Gets most recent location, or prompts user to turn on GPS if it is
      * turned off.
      */
     private void getLocation() {
         // Get most recent location.
+        if (mProvider == null) {
+            Criteria criteria = new Criteria();
+            mProvider = mLocManager.getBestProvider(criteria, true);
+        }
         Location location = mLocManager.getLastKnownLocation(mProvider);
+        onLocationChanged(location);
+    }
 
-        // Could not get location. Is GPS turned off?
-        if (location == null) {
-            // TODO tell user GPS is turned off
-            Toast.makeText(this, "OOPS", Toast.LENGTH_SHORT).show();
+    /**
+     * Prompt user to turn on GPS if they haven't done so already.
+     */
+    private void promptUserGPSEnable() {
+        // Create the dialog if it hasn't been created yet.
+        if (mGpsDialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            // Set "Go to Settings" and "Cancel" buttons.
+            builder.setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // Go to GPS settings menu.
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // Close location sharing. It cannot be used unless GPS
+                    // is turned on.
+                    finish();
+                }
+            });
+
+            builder.setTitle(R.string.gps_prompt_title);
+            builder.setMessage(R.string.gps_prompt);
+            mGpsDialog = builder.create();
+            mGpsDialog.setCancelable(false);
+            mGpsDialog.setCanceledOnTouchOutside(false);
         }
-        else {
-            onLocationChanged(location);
-        }
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        mGpsDialog.show();
     }
 
     /**
@@ -238,7 +282,8 @@ public class MyLocationActivity extends ShareWearActivity implements
                 }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) { }
+                public void onClick(DialogInterface dialog, int id) {
+                }
             });
 
             builder.setTitle(R.string.start_sharing_prompt_title);
@@ -252,10 +297,7 @@ public class MyLocationActivity extends ShareWearActivity implements
      * Turn location sharing off.
      */
     private void turnLocationSharingOff() {
-        // Update UI.
-        mFab.setImageResource(R.mipmap.ic_action_share);
-        mLocationTitle.setText(R.string.not_sharing_location);
-        mMap.clear();
+        updateUI(false);
 
         // Change to lower location-update frequency.
         mApp.setLocationSharingOn(false);
@@ -274,9 +316,7 @@ public class MyLocationActivity extends ShareWearActivity implements
      * Turn location sharing on.
      */
     private void turnLocationSharingOn() {
-        // Update UI.
-        mFab.setImageResource(R.mipmap.ic_action_location_off);
-        mLocationTitle.setText(R.string.sharing_location);
+        updateUI(true);
 
         // Change to higher location-update frequency.
         mApp.setLocationSharingOn(true);
@@ -290,5 +330,22 @@ public class MyLocationActivity extends ShareWearActivity implements
                     Toast.LENGTH_SHORT);
         }
         mShareOnToast.show();
+    }
+
+    /**
+     * Update location sharing UI.
+     *
+     * @param on Whether or not location sharing is on.
+     */
+    private void updateUI(boolean on) {
+        if (on) {
+            mFab.setImageResource(R.mipmap.ic_action_location_off);
+            mLocationTitle.setText(R.string.sharing_location);
+        }
+        else {
+            mFab.setImageResource(R.mipmap.ic_action_share);
+            mLocationTitle.setText(R.string.not_sharing_location);
+            mMap.clear();
+        }
     }
 }
