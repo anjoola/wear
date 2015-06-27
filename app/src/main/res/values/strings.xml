@@ -40,8 +40,10 @@
         Your location history will be shared with all contacts for the next 15 minutes or until
         you stop sharing.
     </string>
-    <string name="gps_prompt_title">Turn on GPS?</string>
-    <string name="gps_prompt">GPS must be turned on to share your location.</string>
+    <string name="gps_prompt_title">GPS is turned off</string>
+    <string name="gps_prompt">
+        GPS must be turned on to share your location. Turn it on in Settings
+    </string>
 
     <!-- Error messages -->
     <string name="play_services_error">

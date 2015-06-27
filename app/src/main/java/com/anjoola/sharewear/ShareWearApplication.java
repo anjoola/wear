@@ -8,7 +8,7 @@ import android.app.Application;
  */
 public class ShareWearApplication extends Application {
     // Whether or not location sharing is turned on.
-    private boolean locationSharingOn;
+    private boolean locationSharingOn = false;
 
     public boolean isLocationSharingOn() {
         return locationSharingOn;

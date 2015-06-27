@@ -120,6 +120,13 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // TODO turn location sharing off when navigating away?
+        turnLocationSharingOff();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_location_menu, menu);
         return true;
@@ -221,17 +228,17 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     /**
-     * Gets most recent location, or prompts user to turn on GPS if it is
-     * turned off.
+     * Gets most recent location.
      */
     private void getLocation() {
-        // Get most recent location.
         if (mProvider == null) {
             Criteria criteria = new Criteria();
             mProvider = mLocManager.getBestProvider(criteria, true);
         }
         Location location = mLocManager.getLastKnownLocation(mProvider);
-        onLocationChanged(location);
+        if (location != null) {
+            onLocationChanged(location);
+        }
     }
 
     /**
@@ -297,6 +304,9 @@ public class MyLocationActivity extends ShareWearActivity implements
      * Turn location sharing off.
      */
     private void turnLocationSharingOff() {
+        // Already turned off.
+        if (!mApp.isLocationSharingOn()) return;
+
         updateUI(false);
 
         // Change to lower location-update frequency.

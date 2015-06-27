@@ -46,7 +46,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Street, City, State"
+            android:text="Loading..."
             android:id="@+id/location_details"
             android:paddingTop="3dp"
             android:textColor="#ff848484"
@@ -57,7 +57,6 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="(Lat, Lng)"
             android:id="@+id/location_latlng"
             android:textColor="#ff848484"
             android:textSize="14sp"
