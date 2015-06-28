@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -31,6 +32,7 @@ public class ContactAddActivity extends ShareWearActivity implements
 
     // Button for adding a photo.
     RoundedImageView mPhoto;
+    FrameLayout mPhotoButton;
     Uri mImageFile;
 
     @Override
@@ -46,7 +48,8 @@ public class ContactAddActivity extends ShareWearActivity implements
         mEmail = (EditText) findViewById(R.id.person_email);
 
         mPhoto = (RoundedImageView) findViewById(R.id.person_photo);
-        mPhoto.setOnClickListener(this);
+        mPhotoButton = (FrameLayout) findViewById(R.id.person_photo_button);
+        mPhotoButton.setOnClickListener(this);
         mImageFile = null;
 
         getActionBar().setHideOnContentScrollEnabled(false);
@@ -62,7 +65,7 @@ public class ContactAddActivity extends ShareWearActivity implements
             startActivity(intent);
         }
         // Start intent to take a picture.
-        else if (v.getId() == R.id.person_photo) {
+        else if (v.getId() == R.id.person_photo_button) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             mImageFile = getImageFileUri();
             intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageFile);

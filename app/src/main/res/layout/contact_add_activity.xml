@@ -4,46 +4,41 @@
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       xmlns:android="http://schemas.android.com/apk/res/android"
-      android:background="#ffffff"
-    >
+      android:background="#ffffff">
 
     <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:id="@+id/scrollview"
-        >
+        android:id="@+id/scrollview">
 
-        <GridLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:rowCount="3"
-            android:columnCount="1"
             android:paddingLeft="25dp"
             android:paddingTop="25dp"
             android:paddingRight="25dp"
             android:paddingBottom="20dp">
 
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:windowActionBar="false"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="20dp">
+            <com.anjoola.sharewear.RoundedImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:id="@+id/person_photo"
+                android:src="@mipmap/ic_add_picture"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_centerHorizontal="true" />
 
-                <com.anjoola.sharewear.RoundedImageView
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:id="@+id/person_photo"
-                    android:src="@mipmap/ic_add_picture"
-                    android:layout_alignParentTop="true"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_centerHorizontal="true"/>
-
-            </RelativeLayout>
+            <!-- Used for ripples. -->
+            <FrameLayout
+                android:id="@+id/person_photo_button"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true"
+                android:clickable="true"
+                android:background="@drawable/ripple"
+                android:layout_centerHorizontal="true" />
 
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -54,7 +49,10 @@
                 android:background="#ffffff"
                 android:orientation="vertical"
                 android:weightSum="1"
-                android:layout_below="@+id/nfc_image">
+                android:layout_below="@+id/person_photo"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:id="@+id/text_entry">
 
                 <!-- Dummy item to prevent EditTexts from receiving focus. -->
                 <LinearLayout
@@ -67,8 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:rowCount="5"
-                    android:columnCount="2"
-                    >
+                    android:columnCount="2">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -99,8 +96,8 @@
                         android:layout_rowSpan="1" />
 
                     <Space
-                        android:layout_width="20px"
-                        android:layout_height="20px"
+                        android:layout_width="20dp"
+                        android:layout_height="8dp"
                         android:layout_columnSpan="2"
                         android:layout_column="0"
                         android:layout_columnWeight="100"
@@ -135,8 +132,8 @@
                         android:layout_rowSpan="1" />
 
                     <Space
-                        android:layout_width="20px"
-                        android:layout_height="20px"
+                        android:layout_width="20dp"
+                        android:layout_height="8dp"
                         android:layout_columnSpan="2"
                         android:layout_column="0"
                         android:layout_columnWeight="100"
@@ -178,20 +175,19 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:gravity="center_horizontal"
-                android:paddingTop="20dp">
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/text_entry">
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/switch_to_nfc"
                     android:id="@+id/nfc_input_button"
-                    android:layout_gravity="center_horizontal|bottom"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true" />
+                    android:layout_gravity="center_horizontal|bottom" />
 
             </LinearLayout>
 
-        </GridLayout>
+        </RelativeLayout>
 
     </ScrollView>
 
