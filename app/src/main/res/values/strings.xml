@@ -18,6 +18,8 @@
     <string name="sign_in_button_text">Sign In with Google+</string>
 
     <!-- ContactsListActivity -->
+    <string name="favorites">Favorites</string>
+    <string name="all_contacts">All Contacts</string>
 
     <!-- ContactAddNFCActivity -->
     <string name="nfc_description">

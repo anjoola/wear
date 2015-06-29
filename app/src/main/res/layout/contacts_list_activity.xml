@@ -6,12 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="0dip">
-
-    <ListView
-        android:id="@+id/contacts_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+    android:padding="0dp">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_my_location"
@@ -28,5 +23,11 @@
         app:fabSize="normal"
         app:backgroundTint="#FF4081"
         app:rippleColor="#ffffbabf" />
+
+    <ListView
+        android:id="@+id/contacts_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:divider="@null" />
 
 </RelativeLayout>

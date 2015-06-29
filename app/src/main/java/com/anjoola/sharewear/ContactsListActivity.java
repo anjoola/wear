@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,8 +31,9 @@ public class ContactsListActivity extends ShareWearActivity implements
     // ListView to store all contacts.
     private ListView mContactsList;
 
-    // Adapter for mapping columns from cursor to ListView.
-    private SimpleCursorAdapter mAdapter;
+    // Adapter for mapping contacts to objects in the ListViews.
+    private SimpleCursorAdapter mFavoritesAdapter, mAdapter;
+    private DoubleListAdapter mDoubleAdapter;
 
     // Asynchronous task to retrieve and load ListView with contacts.
     private ContactsListLoader mLoader;
@@ -52,23 +52,44 @@ public class ContactsListActivity extends ShareWearActivity implements
                 findViewById(R.id.fab_my_location);
         mFab.setOnClickListener(this);
 
+        // TODO
         // Set up contacts list view. Set adapter and scroll listener for
         // infinite scrolling.
         mContactsList = (ListView) findViewById(R.id.contacts_list);
         mContactsList.setOnScrollListener(new EndlessScrollListener());
+
+        mFavoritesAdapter = new SimpleCursorAdapter(this,
+                R.layout.contacts_list_view_favorite,
+                null,
+                new String[] { "photo", "name" },
+                new int[] { R.id.photo, R.id.name }, 0);
+        mAdapter = new SimpleCursorAdapter(this,
+                R.layout.contacts_list_view_layout,
+                null,
+                new String[] { "photo", "name" },
+                new int[] { R.id.photo, R.id.name }, 0);
+
+        /*
         mAdapter = new SimpleCursorAdapter(getBaseContext(),
                 R.layout.contacts_list_view_layout,
                 null,
                 new String[] { "photo", "name", "phone", "email" },
-                new int[] { R.id.photo, R.id.name, R.id.phone, R.id.email }, 0);
-        mContactsList.setAdapter(mAdapter);
+                new int[] { R.id.photo, R.id.name, R.id.phone, R.id.email }, 0);*/
+        //mContactsList.setAdapter(mAdapter);
 
+        mDoubleAdapter = new DoubleListAdapter(this,
+                getString(R.string.favorites), mFavoritesAdapter,
+                getString(R.string.all_contacts), mAdapter);
+        mContactsList.setAdapter(mDoubleAdapter);
+
+        // TODO
         mMatrixCursor = new MatrixCursor(
                 new String[] {"_id", "photo", "name", "phone", "email"});
-
-        // Set up asynchronous task and start it.
-        mLoader = new ContactsListLoader(0);
-        mLoader.execute();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                new ContactsListLoader(0).execute();
+            }
+        });
     }
 
     @Override
@@ -202,7 +223,7 @@ public class ContactsListActivity extends ShareWearActivity implements
                 } while (dCursor.moveToNext());
 
                 // Add contact details to cursor.
-                mMatrixCursor.addRow(new Object[] {
+                mMatrixCursor.addRow(new Object[]{
                         Long.toString(contactId),
                         photoPath,
                         displayName,
@@ -217,8 +238,9 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         @Override
         protected void onPostExecute(Cursor result) {
-            // Setting the cursor containing contacts to listview
             mAdapter.swapCursor(result);
+            mFavoritesAdapter.swapCursor(result);
+            mDoubleAdapter.notifyDataSetChanged();
         }
     }
 
@@ -234,7 +256,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
-            Log.e("-------", "visible: " + visibleItemCount + "  totla: " + totalItemCount);
+            //Log.e("-------", "visible: " + visibleItemCount + "  totla: " + totalItemCount);
             if (loading) {
                 if (totalItemCount > previousTotal) {
                     loading = false;
