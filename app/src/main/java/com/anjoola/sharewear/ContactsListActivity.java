@@ -238,8 +238,8 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         @Override
         protected void onPostExecute(Cursor result) {
+            //mFavoritesAdapter.swapCursor(result);
             mAdapter.swapCursor(result);
-            mFavoritesAdapter.swapCursor(result);
             mDoubleAdapter.notifyDataSetChanged();
         }
     }
