@@ -49,6 +49,15 @@
         </activity>
 
         <activity
+            android:name=".ContactViewActivity"
+            android:label="@string/contact_details"
+            android:parentActivityName="com.anjoola.sharewear.ContactsListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.anjoola.sharewear.ContactsListActivity" />
+        </activity>
+
+        <activity
             android:name=".ContactAddNFCActivity"
             android:label="@string/add_contact"
             android:parentActivityName="com.anjoola.sharewear.ContactsListActivity">

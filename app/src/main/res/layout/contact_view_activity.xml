@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:background="#eeeeee">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/contact_photo"
+        android:src="@mipmap/ic_default_picture"
+        android:scaleType="centerCrop"
+        android:layout_above="@+id/contact_details"
+        android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:elevation="2dp"
+        android:background="#ffffff"
+        android:layout_margin="10dp"
+        android:id="@+id/contact_details"
+        android:layout_alignParentBottom="true">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="1"
+            android:columnCount="2"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/icon_phone"
+                android:src="@mipmap/ic_icon_phone"
+                android:paddingRight="20dp"
+                android:alpha="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_phone"
+                android:id="@+id/text_phone"
+                android:layout_gravity="center_vertical"
+                android:textSize="16dp"/>
+
+        </GridLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#eeeeee" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="1"
+            android:columnCount="2"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/icon_email"
+                android:src="@mipmap/ic_icon_email"
+                android:paddingRight="20dp"
+                android:alpha="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_email"
+                android:id="@+id/text_email"
+                android:layout_gravity="center_vertical"
+                android:textSize="16dp"/>
+
+        </GridLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#eeeeee" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="1"
+            android:columnCount="2"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/icon_navigate"
+                android:src="@mipmap/ic_icon_navigate"
+                android:paddingRight="20dp"
+                android:alpha="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/navigate"
+                android:id="@+id/text_navigate"
+                android:layout_gravity="center_vertical"
+                android:textSize="16dp"/>
+        </GridLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/input_name"
+        android:id="@+id/contact_name"
+        android:textColor="#ffffff"
+        android:layout_alignBottom="@+id/contact_photo"
+        android:paddingBottom="15dp"
+        android:paddingLeft="15dp"
+        android:textSize="36dp" />
+
+</RelativeLayout>

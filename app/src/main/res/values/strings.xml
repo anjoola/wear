@@ -13,6 +13,7 @@
     <string name="share">Share</string>
     <string name="save">Save</string>
     <string name="go_to_settings">Go to Settings</string>
+    <string name="contact_details">Contact Details</string>
 
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
@@ -36,6 +37,12 @@
     <string name="input_phone">Phone</string>
     <string name="input_email">Email</string>
     <string name="switch_to_nfc">Switch to NFC Input</string>
+
+    <!-- ContactViewActivity -->
+    <string name="navigate">Navigate to current location</string>
+    <string name="request">Request current location</string>
+    <string name="add_favorite">Add to Favorites</string>
+    <string name="remove_favorite">Remove from Favorites</string>
 
     <!-- MyLocationActivity -->
     <string name="not_sharing_location">Currently Not Sharing</string>

@@ -119,6 +119,8 @@ public class ContactsListActivity extends ShareWearActivity implements
                 return true;
             case R.id.action_search:
                 // TODO
+                Intent a = new Intent(this, ContactViewActivity.class);
+                startActivity(a);
                 return true;
             case R.id.action_sign_out:
                 signOut();
