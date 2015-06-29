@@ -3,21 +3,19 @@ package com.anjoola.sharewear;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-
-import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * Displays list of contacts and favorites. Allows user to add and search
@@ -28,7 +26,7 @@ public class ContactsListActivity extends ShareWearActivity implements
     // Floating action button for getting current location.
     android.support.design.widget.FloatingActionButton mFab;
 
-    // ListView to store all contacts.
+    // ListView to display all contacts.
     private ListView mContactsList;
 
     // Adapter for mapping contacts to objects in the ListViews.
@@ -42,6 +40,9 @@ public class ContactsListActivity extends ShareWearActivity implements
     // Number of contacts to load at once.
     public static int LOAD_NUM = 20;
 
+    // For getting images for contacts.
+    private ContactsImageProvider mImgProvider;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,8 @@ public class ContactsListActivity extends ShareWearActivity implements
         mFab = (android.support.design.widget.FloatingActionButton)
                 findViewById(R.id.fab_my_location);
         mFab.setOnClickListener(this);
+
+        mImgProvider = new ContactsImageProvider(getBaseContext());
 
         // TODO
         // Set up contacts list view. Set adapter and scroll listener for
@@ -69,6 +72,7 @@ public class ContactsListActivity extends ShareWearActivity implements
                 new String[] { "photo", "name" },
                 new int[] { R.id.photo, R.id.name }, 0);
 
+        // TODO
         /*
         mAdapter = new SimpleCursorAdapter(getBaseContext(),
                 R.layout.contacts_list_view_layout,
@@ -124,9 +128,10 @@ public class ContactsListActivity extends ShareWearActivity implements
         }
     }
 
-    /** An AsyncTask class to retrieve and load listview with contacts */
+    /**
+     * Asynchronous class to retrieve and load ListView with contacts.
+     */
     private class ContactsListLoader extends AsyncTask<Void, Void, Cursor> {
-
         // URIs for retrieving contacts information.
         private final Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;
         private final Uri DATA_URI = ContactsContract.Data.CONTENT_URI;
@@ -146,11 +151,12 @@ public class ContactsListActivity extends ShareWearActivity implements
             // Move to the specified offset, if it exists.
             if (!cursor.moveToPosition(offset * LOAD_NUM)) return null;
 
+            // Loop through every contact.
             int numLoaded = 0;
             do {
                 long contactId = cursor.getLong(cursor.getColumnIndex("_ID"));
 
-                // Retrieve individual items for this contact.
+                // Retrieve individual fields for this contact.
                 Cursor dCursor = getContentResolver().query(DATA_URI, null,
                         ContactsContract.Data.CONTACT_ID + "=" + contactId,
                         null, null);
@@ -158,89 +164,83 @@ public class ContactsListActivity extends ShareWearActivity implements
                 // No data, move on.
                 if (!dCursor.moveToFirst()) continue;
 
-                // Details to retrieve.
-                String displayName = dCursor.getString(dCursor.getColumnIndex(
-                        ContactsContract.Data.DISPLAY_NAME));
-                String photoPath = "";
-                String phone = null;
-                String email = null;
-
-                // Loop since there might be multiple entries.
-                do {
-                    String columnType = dCursor.getString(dCursor.getColumnIndex("mimetype"));
-
-                    // Photo.
-                    if (columnType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)){
-                        byte[] photoByte = dCursor.getBlob(dCursor.getColumnIndex("data15"));
-
-                        if (photoByte == null) continue;
-
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(photoByte, 0, photoByte.length);
-
-                        // Create temporary file to store contact image.
-                        File cacheDirectory = getBaseContext().getCacheDir();
-                        File tmpFile = new File(cacheDirectory.getPath() + "/wpta_"+contactId+".png");
-                        try {
-                            FileOutputStream fOutStream = new FileOutputStream(tmpFile);
-
-                            // Writing the bitmap to the temporary file as png file
-                            bitmap.compress(Bitmap.CompressFormat.PNG,100, fOutStream);
-
-                            fOutStream.flush();
-                            fOutStream.close();
-
-                        } catch (Exception e) { }
-                        photoPath = tmpFile.getPath();
-                    }
-
-                    // Phone numbers.
-                    if (columnType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
-                        switch (dCursor.getInt(dCursor.getColumnIndex("data2"))) {
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                                phone = dCursor.getString(dCursor.getColumnIndex("data1"));
-                                break;
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                                // Only show work phone if no mobile phone.
-                                if (phone == null)
-                                    phone = dCursor.getString(dCursor.getColumnIndex("data1"));
-                                break;
-                        }
-                    }
-
-                    // Email.
-                    if (columnType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
-                        switch (dCursor.getInt(dCursor.getColumnIndex("data2"))) {
-                            case ContactsContract.CommonDataKinds.Email.TYPE_HOME:
-                                email = dCursor.getString(dCursor.getColumnIndex("data1"));
-                                break;
-                            case ContactsContract.CommonDataKinds.Email.TYPE_WORK:
-                                // Only show work email if no home email.
-                                if (email == null)
-                                    email = dCursor.getString(dCursor.getColumnIndex("data1"));
-                                break;
-                        }
-                    }
-                } while (dCursor.moveToNext());
-
-                // Add contact details to cursor.
-                mMatrixCursor.addRow(new Object[]{
-                        Long.toString(contactId),
-                        photoPath,
-                        displayName,
-                        phone,
-                        email
-                });
+                getContactDetails(dCursor, contactId);
 
             } while (numLoaded++ <= LOAD_NUM && cursor.moveToNext());
 
+            cursor.close();
             return mMatrixCursor;
         }
 
         @Override
         protected void onPostExecute(Cursor result) {
+            // TODO get favorites
             //mFavoritesAdapter.swapCursor(result);
             mAdapter.swapCursor(result);
             mDoubleAdapter.notifyDataSetChanged();
+        }
+
+        /**
+         * Get details for the contact at the cursor and add it to the matrix
+         * cursor.
+         *
+         * @param cursor The cursor.
+         */
+        private void getContactDetails(Cursor cursor, long contactId) {
+            // Details to retrieve.
+            String displayName = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.Data.DISPLAY_NAME));
+            String photoPath = "";
+            String phone = null;
+            String email = null;
+
+            // Loop since there might be multiple entries.
+            do {
+                String columnType = cursor.getString(cursor.getColumnIndex("mimetype"));
+
+                // Photo.
+                if (columnType.equals(Photo.CONTENT_ITEM_TYPE)) {
+                    byte[] photoByte = cursor.getBlob(cursor.getColumnIndex("data15"));
+                    photoPath = mImgProvider.getImagePath(photoByte, displayName);
+                }
+
+                // Phone numbers.
+                if (columnType.equals(Phone.CONTENT_ITEM_TYPE)) {
+                    switch (cursor.getInt(cursor.getColumnIndex("data2"))) {
+                        case Phone.TYPE_MOBILE:
+                            phone = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                        case Phone.TYPE_WORK:
+                            // Only show work phone if no mobile phone.
+                            if (phone == null)
+                                phone = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                    }
+                }
+
+                // Email.
+                if (columnType.equals(Email.CONTENT_ITEM_TYPE)) {
+                    switch (cursor.getInt(cursor.getColumnIndex("data2"))) {
+                        case Email.TYPE_HOME:
+                            email = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                        case Email.TYPE_WORK:
+                            // Only show work email if no home email.
+                            if (email == null)
+                                email = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                    }
+                }
+            } while (cursor.moveToNext());
+
+            // Add contact details to cursor.
+            mMatrixCursor.addRow(new Object[]{
+                    Long.toString(contactId),
+                    photoPath,
+                    displayName,
+                    phone,
+                    email
+            });
         }
     }
 
