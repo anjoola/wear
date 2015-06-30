@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
  * http://stackoverflow.com/questions/23122088/colored-boxed-with-letters-a-la-gmail.
  */
 public class ContactsImageProvider {
+    private final String DEFAULT_CONTACT_PHOTO =
+            "android.resource://com.anjoola.sharewear/mipmap/ic_default_picture";
     private Context mContext;
 
     // Possible default background colors.
@@ -60,8 +62,7 @@ public class ContactsImageProvider {
      *
      * @param displayName The name used for the first letter.
      * @return A bitmap that contains a letter used in the English alphabet
-     *         or digit. If there is no letter or digit available, a default
-     *         image is shown instead.
+     *         or digit. If there is no letter or digit available, returns null.
      */
     private Bitmap getDefaultContactPhoto(String displayName) {
         final Bitmap bitmap = Bitmap.createBitmap(IMAGE_SIZE, IMAGE_SIZE,
@@ -73,10 +74,10 @@ public class ContactsImageProvider {
         canvas.drawColor(pickColor(displayName.hashCode()));
 
         // Get first character.
-        if (isEnglishLetterOrDigit(firstChar))
+        if (isAlphanumeric(firstChar))
             mFirstChar[0] = Character.toUpperCase(firstChar);
         else
-            mFirstChar[0] = '?';
+            return null;
 
         mPaint.setTextSize(FONT_SIZE);
         mPaint.getTextBounds(mFirstChar, 0, 1, mBounds);
@@ -103,6 +104,8 @@ public class ContactsImageProvider {
             return tmpFile.getPath();
 
         Bitmap bitmap = getDefaultContactPhoto(contactName);
+        if (bitmap == null)
+            return DEFAULT_CONTACT_PHOTO;
 
         try {
             FileOutputStream fOutStream = new FileOutputStream(tmpFile);
@@ -122,7 +125,7 @@ public class ContactsImageProvider {
      * @return True if it is in the English alphabet or is a digit, false
      *         otherwise.
      */
-    private static boolean isEnglishLetterOrDigit(char c) {
+    private static boolean isAlphanumeric(char c) {
         return ('A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' ||
                 '0' <= c && c <= '9');
     }

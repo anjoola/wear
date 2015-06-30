@@ -249,6 +249,9 @@ public class ContactsListActivity extends ShareWearActivity implements
                 }
             } while (cursor.moveToNext());
 
+            // If contact has neither a phone nor email, don't show them.
+            if (phone == null && email == null) return;
+
             // Get default photo if contact photo does not exist.
             if (photoUri == null)
                 photoUri = mImgProvider.getDefaultContactUri(displayName);
