@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -22,7 +23,7 @@ import android.widget.SimpleCursorAdapter;
  * for contacts. Floating action button allows user to share their location.
  */
 public class ContactsListActivity extends ShareWearActivity implements
-        View.OnClickListener {
+        View.OnClickListener, OnItemClickListener {
     // Floating action button for getting current location.
     android.support.design.widget.FloatingActionButton mFab;
 
@@ -60,6 +61,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         // infinite scrolling.
         mContactsList = (ListView) findViewById(R.id.contacts_list);
         mContactsList.setOnScrollListener(new EndlessScrollListener());
+        mContactsList.setOnItemClickListener(this);
 
         mFavoritesAdapter = new SimpleCursorAdapter(this,
                 R.layout.contacts_list_view_favorite,
@@ -105,6 +107,19 @@ public class ContactsListActivity extends ShareWearActivity implements
     }
 
     @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        MatrixCursor entry = (MatrixCursor) parent.getAdapter().getItem(position);
+
+        // Send contact details over to activity.
+        Intent intent = new Intent(this, ContactViewActivity.class);
+        intent.putExtra(ShareWearActivity.PHOTO, entry.getString(1));
+        intent.putExtra(ShareWearActivity.NAME, entry.getString(2));
+        intent.putExtra(ShareWearActivity.PHONE, entry.getString(3));
+        intent.putExtra(ShareWearActivity.EMAIL, entry.getString(4));
+        startActivity(intent);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_list_menu, menu);
         return true;
@@ -119,8 +134,6 @@ public class ContactsListActivity extends ShareWearActivity implements
                 return true;
             case R.id.action_search:
                 // TODO
-                Intent a = new Intent(this, ContactViewActivity.class);
-                startActivity(a);
                 return true;
             case R.id.action_sign_out:
                 signOut();
@@ -192,19 +205,14 @@ public class ContactsListActivity extends ShareWearActivity implements
             // Details to retrieve.
             String displayName = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.Data.DISPLAY_NAME));
-            String photoPath = "";
+            String photoUri = cursor.getString(cursor.getColumnIndex(
+                    Phone.PHOTO_URI));
             String phone = null;
             String email = null;
 
             // Loop since there might be multiple entries.
             do {
                 String columnType = cursor.getString(cursor.getColumnIndex("mimetype"));
-
-                // Photo.
-                if (columnType.equals(Photo.CONTENT_ITEM_TYPE)) {
-                    byte[] photoByte = cursor.getBlob(cursor.getColumnIndex("data15"));
-                    photoPath = mImgProvider.getImagePath(photoByte, displayName);
-                }
 
                 // Phone numbers.
                 if (columnType.equals(Phone.CONTENT_ITEM_TYPE)) {
@@ -213,7 +221,10 @@ public class ContactsListActivity extends ShareWearActivity implements
                             phone = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
                         case Phone.TYPE_WORK:
-                            // Only show work phone if no mobile phone.
+                            if (phone == null)
+                                phone = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                        case Phone.TYPE_OTHER:
                             if (phone == null)
                                 phone = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
@@ -227,7 +238,10 @@ public class ContactsListActivity extends ShareWearActivity implements
                             email = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
                         case Email.TYPE_WORK:
-                            // Only show work email if no home email.
+                            if (email == null)
+                                email = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                        case Email.TYPE_OTHER:
                             if (email == null)
                                 email = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
@@ -235,10 +249,14 @@ public class ContactsListActivity extends ShareWearActivity implements
                 }
             } while (cursor.moveToNext());
 
+            // Get default photo if contact photo does not exist.
+            if (photoUri == null)
+                photoUri = mImgProvider.getDefaultContactUri(displayName);
+
             // Add contact details to cursor.
             mMatrixCursor.addRow(new Object[]{
                     Long.toString(contactId),
-                    photoPath,
+                    photoUri,
                     displayName,
                     phone,
                     email

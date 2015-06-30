@@ -2,20 +2,20 @@ package com.anjoola.sharewear;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.text.TextPaint;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
 /**
- * Gets the corresponding photo for a contact. If one does not exist, creates
- * a generic one with just the first letter of their name. Courtesy of
+ * Gets the corresponding photo for a contact, by creating a default-lettered
+ * one using the first letter of their name. Courtesy of
  * http://stackoverflow.com/questions/23122088/colored-boxed-with-letters-a-la-gmail.
  */
 public class ContactsImageProvider {
@@ -34,8 +34,8 @@ public class ContactsImageProvider {
     };
 
     // Sizes.
-    private final int FONT_SIZE = 140;
-    private final int IMAGE_SIZE = 200;
+    private final int FONT_SIZE = 700;
+    private final int IMAGE_SIZE = 1000;
 
     // Used for drawing the letter-image.
     private final TextPaint mPaint = new TextPaint();
@@ -63,7 +63,7 @@ public class ContactsImageProvider {
      *         or digit. If there is no letter or digit available, a default
      *         image is shown instead.
      */
-    public Bitmap getDefaultContactPhoto(String displayName) {
+    private Bitmap getDefaultContactPhoto(String displayName) {
         final Bitmap bitmap = Bitmap.createBitmap(IMAGE_SIZE, IMAGE_SIZE,
                 Bitmap.Config.ARGB_8888);
         final char firstChar = displayName.charAt(0);
@@ -76,7 +76,7 @@ public class ContactsImageProvider {
         if (isEnglishLetterOrDigit(firstChar))
             mFirstChar[0] = Character.toUpperCase(firstChar);
         else
-            mFirstChar[0] = '\u263a';
+            mFirstChar[0] = '?';
 
         mPaint.setTextSize(FONT_SIZE);
         mPaint.getTextBounds(mFirstChar, 0, 1, mBounds);
@@ -87,27 +87,23 @@ public class ContactsImageProvider {
     }
 
     /**
-     * Get the image path for a given array of bytes. Creates a temporary file
-     * with the bytes as a bitmap. If bytes is null, then create a default
-     * image with just the first letter of the name as the image.
+     * Creates and returns the URI for the default contact photo. Creates a
+     * temporary file to store this, if it does not exist already.
      *
-     * @param bytes Array of bytes for the image.
      * @param contactName Name of the contact.
-     * @return A string containing the file path of the image.
+     * @return A string containing the URI of the image.
      */
-    public String getImagePath(byte[] bytes, String contactName) {
-        Bitmap bitmap;
-
-        // No contact photo, create default letter-image.
-        if (bytes == null)
-            bitmap = getDefaultContactPhoto(contactName);
-        else
-            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
+    public String getDefaultContactUri(String contactName) {
         // Create temporary file to store contact image.
         File cacheDirectory = mContext.getCacheDir();
         File tmpFile = new File(cacheDirectory.getPath() + "/wpta_" +
-                contactName.hashCode() + ".png");
+                contactName.hashCode() + ".jpg");
+
+        if (tmpFile.exists())
+            return tmpFile.getPath();
+
+        Bitmap bitmap = getDefaultContactPhoto(contactName);
+
         try {
             FileOutputStream fOutStream = new FileOutputStream(tmpFile);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOutStream);
@@ -116,7 +112,7 @@ public class ContactsImageProvider {
             fOutStream.close();
         } catch (Exception e) { }
 
-        return tmpFile.getPath();
+        return Uri.fromFile(tmpFile).toString();
     }
 
     /**

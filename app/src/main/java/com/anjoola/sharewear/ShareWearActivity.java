@@ -8,6 +8,10 @@ import android.content.Intent;
  */
 public class ShareWearActivity extends ShareWearBaseActivity {
     public final static String SIGN_OUT = "SIGN_OUT";
+    public final static String PHOTO = "PHOTO";
+    public final static String NAME = "NAME";
+    public final static String PHONE = "PHONE";
+    public final static String EMAIL = "EMAIL";
 
     /**
      * Attempt to sign out. Go back go the login activity.
