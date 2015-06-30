@@ -164,7 +164,8 @@ public class ContactsListActivity extends ShareWearActivity implements
                     null, ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
 
             // Move to the specified offset, if it exists.
-            if (!cursor.moveToPosition(offset * LOAD_NUM)) return null;
+            if (!cursor.moveToPosition(offset * LOAD_NUM))
+                return null;
 
             // Loop through every contact.
             int numLoaded = 0;
@@ -181,7 +182,7 @@ public class ContactsListActivity extends ShareWearActivity implements
 
                 getContactDetails(dCursor, contactId);
 
-            } while (numLoaded++ <= LOAD_NUM && cursor.moveToNext());
+            } while (++numLoaded < LOAD_NUM && cursor.moveToNext());
 
             cursor.close();
             return mMatrixCursor;
@@ -221,6 +222,10 @@ public class ContactsListActivity extends ShareWearActivity implements
                             phone = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
                         case Phone.TYPE_WORK:
+                            if (phone == null)
+                                phone = cursor.getString(cursor.getColumnIndex("data1"));
+                            break;
+                        case Phone.TYPE_HOME:
                             if (phone == null)
                                 phone = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
@@ -273,28 +278,23 @@ public class ContactsListActivity extends ShareWearActivity implements
         private int offset = 0;
 
         private int previousTotal = 0;
-        private boolean loading = true;
+        private boolean loading = false;
 
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
-            //Log.e("-------", "visible: " + visibleItemCount + "  totla: " + totalItemCount);
-            if (loading) {
-                if (totalItemCount > previousTotal) {
-                    loading = false;
-                    previousTotal = totalItemCount;
-                    offset++;
-                }
+            if (loading && totalItemCount > previousTotal) {
+                loading = false;
             }
-            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + LOAD_NUM)) {
-                return;
-//                runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        new ContactsListLoader(offset).execute();
-//                        loading = true;
-//                    }
-//                });
+            if (!loading && (firstVisibleItem + visibleItemCount - 2 >= previousTotal + LOAD_NUM - 10)) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        new ContactsListLoader(++offset).execute();
+                        previousTotal += LOAD_NUM;
+                        loading = true;
+                    }
+                });
             }
         }
 
