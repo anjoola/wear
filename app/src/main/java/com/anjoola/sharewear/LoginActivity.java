@@ -62,12 +62,11 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // Sign in button.
     private SignInButton mSignInButton;
 
-    // Used to connect to Google Play Services and allow Google+ sign in.
-    private GoogleApiClient mGoogleApiClient;
-
     // Title TextView.
-    TextView title;
+    private TextView title;
 
+    // Application, used for getting the Google API client.
+    ShareWearApplication mApp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +80,8 @@ public class LoginActivity extends ShareWearBaseActivity implements
         title.setTypeface(typeface);
 
         // Initialize Google API client.
-        mGoogleApiClient = buildGoogleApiClient();
+        mApp = (ShareWearApplication) getApplication();
+        mApp.googleApiClient = buildGoogleApiClient();
 
         // Did we come from a sign out? If so, actually sign out.
         Intent intent = getIntent();
@@ -144,8 +144,8 @@ public class LoginActivity extends ShareWearBaseActivity implements
                 }
 
                 // Google Play Services resolved issue. Re-attempt connection.
-                if (!mGoogleApiClient.isConnecting()) {
-                    mGoogleApiClient.connect();
+                if (!mApp.googleApiClient.isConnecting()) {
+                    mApp.googleApiClient.connect();
                 }
                 break;
         }
@@ -161,7 +161,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // User just signed in and successfully connected to Google Play Services.
     public void onConnected(Bundle connectionHint) {
         mSignInProgress = STATE_DEFAULT;
-        Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        Person currentUser = Plus.PeopleApi.getCurrentPerson(mApp.googleApiClient);
         prefSetUser(currentUser.getId());
         toMainActivity(false);
     }
@@ -190,7 +190,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
     @Override
     public void onConnectionSuspended(int cause) {
         // Lost connection. Attempt to re-establish connection.
-        mGoogleApiClient.connect();
+        mApp.googleApiClient.connect();
     }
 
     /**
@@ -258,7 +258,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
             // Intent cancelled before it was sent.
             catch (SendIntentException e) {
                 mSignInProgress = STATE_SIGN_IN;
-                mGoogleApiClient.connect();
+                mApp.googleApiClient.connect();
             }
         }
         // Google Play Services could not provide an intent for other errors.
@@ -274,12 +274,12 @@ public class LoginActivity extends ShareWearBaseActivity implements
     private void signIn() {
         // Only process if not transitioning between connection state for the
         // GoogleApiClient.
-        if (mGoogleApiClient.isConnecting()) {
+        if (mApp.googleApiClient.isConnecting()) {
             return;
         }
 
         mSignInProgress = STATE_SIGN_IN;
-        mGoogleApiClient.connect();
+        mApp.googleApiClient.connect();
     }
 
     /**
@@ -288,9 +288,9 @@ public class LoginActivity extends ShareWearBaseActivity implements
     private void signOut() {
         prefSetUser(null);
 
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
+        if (mApp.googleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mApp.googleApiClient);
+            mApp.googleApiClient.disconnect();
         }
     }
 

@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,7 +22,7 @@ import android.widget.ImageView;
  * input if NFC is not turned on or not desired.
  */
 public class ContactAddNFCActivity extends ShareWearActivity implements
-        View.OnClickListener {
+        View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
     // Animation for NFC.
     AnimationDrawable animation;
 
@@ -52,6 +55,10 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
         ImageView animationView = (ImageView) findViewById(R.id.nfc_image);
         animationView.setBackgroundResource(R.drawable.nfc_animation);
         animation = (AnimationDrawable) animationView.getBackground();
+
+        // Used for sending NFC data.
+        NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
     }
 
     @Override
@@ -90,6 +97,16 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
         }
     }
 
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        // Send contact information via NFC.
+        String message = ContactDetails
+                .getMyContactDetails((ShareWearApplication) getApplication());
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain",
+                message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
+        return ndefMessage;
+    }
 
     /**
      * Checks if NFC is turned on. If not, prompt the user to turn it on.

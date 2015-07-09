@@ -4,8 +4,11 @@ import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
@@ -68,6 +71,32 @@ public class ContactAddActivity extends ShareWearActivity implements
         mImageFileUri = null;
 
         getActionBar().setHideOnContentScrollEnabled(false);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        setIntent(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // See if this was started via NFC input. If so, fill in the text fields
+        // with the data received via NFC.
+        Intent intent = getIntent();
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Parcelable[] rawMessages = intent.getParcelableArrayExtra(
+                    NfcAdapter.EXTRA_NDEF_MESSAGES);
+            NdefMessage message = (NdefMessage) rawMessages[0];
+            String nfcData = new String(message.getRecords()[0].getPayload());
+            ContactDetails info = ContactDetails.decodeNfcData(nfcData);
+
+            // Set the text fields.
+            mName.setText(info.name);
+            mPhone.setText(info.phone);
+            mEmail.setText(info.email);
+        }
     }
 
     @Override
