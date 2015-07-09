@@ -54,8 +54,8 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
 
         // Start animation.
         ImageView animationView = (ImageView) findViewById(R.id.nfc_image);
-        animationView.setBackgroundResource(R.drawable.nfc_animation);
-        animation = (AnimationDrawable) animationView.getBackground();
+        animationView.setImageDrawable(getDrawable(R.drawable.nfc_animation));
+        animation = (AnimationDrawable) animationView.getDrawable();
 
         // Used for sending NFC data.
         NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);

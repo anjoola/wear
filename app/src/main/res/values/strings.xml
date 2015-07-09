@@ -24,13 +24,15 @@
 
     <!-- ContactAddNFCActivity -->
     <string name="nfc_description">
-        Use NFC to exchange your contact information with someone else. Tap your phones together.
+        Use NFC to exchange your contact information with someone else. Bring your phones together
+        and tap the screen.
     </string>
     <string name="nfc_prompt_title">NFC is turned off</string>
     <string name="nfc_prompt">
         NFC must be turned on in order to exchange contact information. Turn it on in Settings.
     </string>
     <string name="switch_to_manual">Switch to Manual Input</string>
+    <string name="nfc_input_title">Input via NFC</string>
 
     <!-- ContactAddActivity -->
     <string name="input_name">Name</string>

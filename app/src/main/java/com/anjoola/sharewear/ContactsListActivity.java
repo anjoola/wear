@@ -1,5 +1,7 @@
 package com.anjoola.sharewear;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,10 +47,95 @@ public class ContactsListActivity extends ShareWearActivity implements
     // For getting images for contacts.
     private ContactsImageProvider mImgProvider;
 
+    /**
+     * Contacts user profile query interface.
+     */
+    private interface ProfileQuery {
+        /** The set of columns to extract from the profile query results */
+        String[] PROJECTION = {
+                ContactsContract.CommonDataKinds.Email.ADDRESS,
+                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
+                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone.IS_PRIMARY,
+                ContactsContract.CommonDataKinds.Photo.PHOTO_URI,
+                ContactsContract.Contacts.Data.MIMETYPE
+        };
+
+        /** Column index for the email address in the profile query results */
+        int EMAIL = 0;
+        /** Column index for the primary email address indicator in the profile query results */
+        int IS_PRIMARY_EMAIL = 1;
+        /** Column index for the family name in the profile query results */
+        int FAMILY_NAME = 2;
+        /** Column index for the given name in the profile query results */
+        int GIVEN_NAME = 3;
+        /** Column index for the phone number in the profile query results */
+        int PHONE_NUMBER = 4;
+        /** Column index for the primary phone number in the profile query results */
+        int IS_PRIMARY_PHONE_NUMBER = 5;
+        /** Column index for the photo in the profile query results */
+        int PHOTO = 6;
+        /** Column index for the MIME type in the profile query results */
+        int MIME_TYPE = 7;
+    }
+
+    private static String getUserProfileOnIcsDevice(Context context) {
+        final ContentResolver content = context.getContentResolver();
+        final Cursor cursor = content.query(
+                // Retrieves data rows for the device user's 'profile' contact
+                Uri.withAppendedPath(
+                        ContactsContract.Profile.CONTENT_URI,
+                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY),
+                ProfileQuery.PROJECTION,
+
+                // Selects only email addresses or names
+                ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=?",
+                new String[]{
+                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
+                },
+
+                // Show primary rows first. Note that there won't be a primary email address if the
+                // user hasn't specified one.
+                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
+        );
+
+        String stuff = "";
+        String mime_type;
+        while (cursor.moveToNext()) {
+            mime_type = cursor.getString(ProfileQuery.MIME_TYPE);
+            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE))
+                stuff += cursor.getString(ProfileQuery.EMAIL);
+            else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE))
+                stuff += cursor.getString(ProfileQuery.GIVEN_NAME) + " " + cursor.getString(ProfileQuery.FAMILY_NAME);
+            else if (mime_type.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE))
+                stuff += cursor.getString(ProfileQuery.PHONE_NUMBER);
+           // else if (mime_type.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE))
+                //photo???
+               // user_profile.addPossiblePhoto(Uri.parse(cursor.getString(ProfileQuery.PHOTO)));
+        }
+
+        cursor.close();
+
+        return stuff;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_list_activity);
+
+
+        String result = getUserProfileOnIcsDevice(this);
+        Log.e("----", result);
+
 
         // Set up handler for getting current location floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
