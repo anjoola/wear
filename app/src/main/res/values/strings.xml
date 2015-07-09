@@ -56,10 +56,14 @@
         Your location history will be shared with all contacts for the next 15 minutes or until
         you stop sharing.
     </string>
+    <string name="stop_sharing_prompt_title">Stop sharing location?</string>
+    <string name="stop_sharing_prompt">Leaving this screen will stop location sharing.</string>
     <string name="gps_prompt_title">GPS is turned off</string>
     <string name="gps_prompt">
         GPS must be turned on to share your location. Turn it on in Settings
     </string>
+    <string name="notification_title">Location sharing enabled</string>
+    <string name="notification_text">Touch to stop sharing.</string>
 
     <!-- Error messages -->
     <string name="play_services_error">

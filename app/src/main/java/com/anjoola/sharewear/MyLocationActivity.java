@@ -1,8 +1,14 @@
 package com.anjoola.sharewear;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -10,7 +16,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v7.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,8 +44,8 @@ public class MyLocationActivity extends ShareWearActivity implements
     private android.support.design.widget.FloatingActionButton mFab;
 
     // Handlers for getting location.
-    LocationManager mLocManager;
-    String mProvider;
+    private LocationManager mLocManager;
+    private String mProvider;
 
     // Google Map to display current location.
     private GoogleMap mMap;
@@ -62,6 +70,13 @@ public class MyLocationActivity extends ShareWearActivity implements
     private AlertDialog mShareLocationDialog, mGpsDialog;
     private Toast mShareOnToast, mShareOffToast;
 
+    // Used for a persistent notification when location sharing starts.
+    public static int NOTIFICATION_ID = 399399;
+    private Notification mNotification;
+    private NotificationManager mNotificationManager;
+    private ServiceConnection mConnection;
+    private Intent mKillIntent;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +92,9 @@ public class MyLocationActivity extends ShareWearActivity implements
         mGpsDialog = null;
         mShareOnToast = null;
         mShareOffToast = null;
+        mNotification = null;
+        mConnection = null;
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // Set up handler for floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
@@ -122,8 +140,11 @@ public class MyLocationActivity extends ShareWearActivity implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // TODO turn location sharing off when navigating away?
+
+        // Turn location sharing off if not at this activity.
         turnLocationSharingOff();
+
+        // TODO unbindService(mConnection);
     }
 
     @Override
@@ -166,19 +187,13 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     @Override
-    public void onStatusChanged(String mProvider, int status, Bundle extras) {
-        // TODO
-    }
+    public void onStatusChanged(String mProvider, int status, Bundle extras) { }
 
     @Override
-    public void onProviderEnabled(String mProvider) {
-        // TODO
-    }
+    public void onProviderEnabled(String mProvider) { }
 
     @Override
-    public void onProviderDisabled(String mProvider) {
-        // TODO warning about GPS disabled
-    }
+    public void onProviderDisabled(String mProvider) { }
 
     /**
      * Formats the latitude and longitude into the following:
@@ -303,7 +318,7 @@ public class MyLocationActivity extends ShareWearActivity implements
     /**
      * Turn location sharing off.
      */
-    private void turnLocationSharingOff() {
+    public void turnLocationSharingOff() {
         // Already turned off.
         if (!mApp.isLocationSharingOn()) return;
 
@@ -320,6 +335,11 @@ public class MyLocationActivity extends ShareWearActivity implements
                     Toast.LENGTH_SHORT);
         }
         mShareOffToast.show();
+
+        // Hide the notification.
+        mNotificationManager.cancel(NOTIFICATION_ID);
+        stopService(mKillIntent);
+        unbindService(mConnection);
     }
 
     /**
@@ -340,6 +360,44 @@ public class MyLocationActivity extends ShareWearActivity implements
                     Toast.LENGTH_SHORT);
         }
         mShareOnToast.show();
+
+        // Show persistent notification.
+        if (mConnection == null) {
+            // Create notification.
+            NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(this);
+            builder.setSmallIcon(R.mipmap.ic_action_share);
+            builder.setContentTitle(getString(R.string.notification_title));
+            builder.setContentText(getString(R.string.notification_text));
+            builder.setOngoing(true);
+
+            // Add intent so clicking on the notification will go to the app.
+            Intent resultIntent = new Intent(this, MyLocationActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            stackBuilder.addParentStack(MyLocationActivity.class);
+
+            // Make it so the activity starts at the top of the stack.
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent pendingIntent =
+                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setContentIntent(pendingIntent);
+
+            mNotification = builder.build();
+
+            mConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName className,
+                                               IBinder binder) {
+                    mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName className) { }
+            };
+        }
+        mKillIntent = new Intent(this, KillNotificationService.class);
+        startService(mKillIntent);
+        bindService(mKillIntent, mConnection, BIND_AUTO_CREATE);
     }
 
     /**
