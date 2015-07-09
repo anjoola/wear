@@ -102,11 +102,8 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
     public NdefMessage createNdefMessage(NfcEvent event) {
         // Send contact information via NFC.
         String message = prefGetContactDetails();
-        //String message = ContactDetails
-        //        .getMyContactDetails((ShareWearApplication) getApplication());
-        Log.e("----", message);
-                NdefRecord ndefRecord = NdefRecord.createMime("text/plain",
-                        message.getBytes());
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain",
+                message.getBytes());
         NdefMessage ndefMessage = new NdefMessage(ndefRecord);
         return ndefMessage;
     }
