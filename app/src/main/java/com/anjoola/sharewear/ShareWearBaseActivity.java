@@ -17,8 +17,9 @@ public class ShareWearBaseActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPref = getPreferences(Context.MODE_PRIVATE);
+        mPref = getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         mPrefEditor = mPref.edit();
+        mPrefEditor.apply();
     }
 
     public String prefGetUser() {
@@ -31,6 +32,20 @@ public class ShareWearBaseActivity extends FragmentActivity {
         }
         else {
             mPrefEditor.remove(getString(R.string.pref_user));
+        }
+        mPrefEditor.commit();
+    }
+
+    public String prefGetContactDetails() {
+        return mPref.getString(getString(R.string.pref_contact_details), null);
+    }
+
+    public void prefSetContactDetails(String details) {
+        if (details != null) {
+            mPrefEditor.putString(getString(R.string.pref_contact_details), details);
+        }
+        else {
+            mPrefEditor.remove(getString(R.string.pref_contact_details));
         }
         mPrefEditor.commit();
     }

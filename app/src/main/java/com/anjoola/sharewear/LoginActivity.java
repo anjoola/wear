@@ -59,12 +59,6 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // Sign in progress state, saved.
     private static final String SAVED_PROGRESS = "sign_in_progress";
 
-    // Sign in button.
-    private SignInButton mSignInButton;
-
-    // Title TextView.
-    private TextView title;
-
     // Application, used for getting the Google API client.
     ShareWearApplication mApp;
 
@@ -74,7 +68,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
         setContentView(R.layout.login_activity);
 
         // Set font for title.
-        title = (TextView) findViewById(R.id.sharewear_title);
+        TextView title = (TextView) findViewById(R.id.sharewear_title);
         Typeface typeface = Typeface.createFromAsset(getAssets(),
                 "fonts/OleoScriptSwashCaps-Regular.ttf");
         title.setTypeface(typeface);
@@ -109,16 +103,16 @@ public class LoginActivity extends ShareWearBaseActivity implements
         }
 
         // Set up sign in button. Change text and add listener.
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        for (int i = 0; i < mSignInButton.getChildCount(); i++) {
-            View v = mSignInButton.getChildAt(i);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        for (int i = 0; i < signInButton.getChildCount(); i++) {
+            View v = signInButton.getChildAt(i);
             if (v instanceof TextView) {
                 TextView mTextView = (TextView) v;
                 mTextView.setText(R.string.sign_in_button_text);
                 break;
             }
         }
-        mSignInButton.setOnClickListener(this);
+        signInButton.setOnClickListener(this);
     }
 
     @Override
@@ -162,7 +156,11 @@ public class LoginActivity extends ShareWearBaseActivity implements
     public void onConnected(Bundle connectionHint) {
         mSignInProgress = STATE_DEFAULT;
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mApp.googleApiClient);
+
+        // Save user details for next startup.
         prefSetUser(currentUser.getId());
+        String details = ContactDetails.getMyContactDetails(mApp);
+        prefSetContactDetails(details);
         toMainActivity(false);
     }
 

@@ -72,5 +72,6 @@
 
     <!-- Preferences -->
     <string name="pref_user">pref_user</string>
+    <string name="pref_contact_details">pref_contact_details</string>
 
 </resources>
