@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -96,6 +97,10 @@ public class ContactAddActivity extends ShareWearActivity implements
             mName.setText(info.name);
             mPhone.setText(info.phone);
             mEmail.setText(info.email);
+
+            // Hide the NFC input button.
+            LinearLayout buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
+            buttonLayout.setVisibility(0);
         }
     }
 
@@ -151,13 +156,15 @@ public class ContactAddActivity extends ShareWearActivity implements
      * Adds a new contact based on the values filled out in the text fields.
      */
     private void addContact() {
+        // TODO error message if name not filled out
+
+
         // Get filled out fields.
         String name = mName.getText().toString();
         String phone = mPhone.getText().toString();
         String email = mEmail.getText().toString();
 
-        ArrayList<ContentProviderOperation> ops =
-                new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         int contactIdx = ops.size();
 
         // Insert raw contact into contacts database.
@@ -217,7 +224,11 @@ public class ContactAddActivity extends ShareWearActivity implements
         try {
             getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
 
-            // TODO success page
+            // Show success page.
+            ShareWearApplication app = (ShareWearApplication) getApplication();
+            app.newContactDetails = new ContactDetails(name, phone, email, mImageFile);
+            Intent intent = new Intent(this, ContactAddDoneActivity.class);
+            startActivity(intent);
         }
         // TODO handle exceptions
         catch (RemoteException exp) {}

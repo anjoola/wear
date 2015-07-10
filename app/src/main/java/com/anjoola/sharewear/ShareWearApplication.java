@@ -15,6 +15,9 @@ public class ShareWearApplication extends Application {
     // Google API client for getting account details.
     public GoogleApiClient googleApiClient;
 
+    // Contact details for a newly-created contact.
+    public ContactDetails newContactDetails;
+
     public boolean isLocationSharingOn() {
         return locationSharingOn;
     }

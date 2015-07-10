@@ -11,7 +11,6 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.nfc.NfcManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -104,8 +103,7 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
         String message = prefGetContactDetails();
         NdefRecord ndefRecord = NdefRecord.createMime("text/plain",
                 message.getBytes());
-        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
-        return ndefMessage;
+        return new NdefMessage(ndefRecord);
     }
 
     /**

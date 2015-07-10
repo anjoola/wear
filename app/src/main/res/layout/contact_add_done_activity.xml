@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical"
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.anjoola.sharewear.RoundedImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/contact_photo"
+        android:src="@mipmap/check_bg"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:id="@+id/checkmark"
+            android:src="@mipmap/check_0"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp"
+            />
+    </RelativeLayout>
+
+    <GridLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:rowCount="5"
+        android:columnCount="2"
+        android:paddingTop="25dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/icon_person"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:layout_columnSpan="1"
+            android:src="@mipmap/ic_icon_person"
+            android:layout_gravity="center_vertical"
+            android:alpha="0.4"
+            android:paddingRight="15dp"
+            android:paddingLeft="25dp"/>
+
+        <TextView
+            android:id="@+id/person_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords|textPersonName"
+            android:hint="@string/input_name"
+            android:ems="10"
+            android:nextFocusUp="@+id/person_name"
+            android:nextFocusLeft="@+id/person_name"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_columnSpan="1"
+            android:layout_rowSpan="1"
+            android:theme="@style/ShareWearTheme"
+            android:layout_marginRight="86dp"
+            android:textSize="20dp"
+            android:paddingLeft="5dp"
+            android:textColor="#666666"/>
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="28dp"
+            android:layout_columnSpan="2"
+            android:layout_column="0"
+            android:layout_columnWeight="100"
+            android:layout_row="1"
+            android:layout_rowSpan="1"
+            android:layout_gravity="left" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/icon_phone"
+            android:layout_column="0"
+            android:layout_row="2"
+            android:layout_columnSpan="1"
+            android:src="@mipmap/ic_icon_phone"
+            android:layout_gravity="center_vertical"
+            android:alpha="0.4"
+            android:paddingRight="15dp"
+            android:paddingLeft="25dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:ems="10"
+            android:id="@+id/person_phone"
+            android:hint="@string/phone_empty"
+            android:layout_columnSpan="1"
+            android:layout_column="1"
+            android:layout_row="2"
+            android:layout_rowSpan="1"
+            android:layout_marginRight="86dp"
+            android:textSize="20dp"
+            android:paddingLeft="5dp"
+            android:textColor="#666666"/>
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="28dp"
+            android:layout_columnSpan="2"
+            android:layout_column="0"
+            android:layout_columnWeight="100"
+            android:layout_row="3"
+            android:layout_rowSpan="1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/icon_email"
+            android:layout_column="0"
+            android:layout_row="4"
+            android:layout_columnSpan="1"
+            android:src="@mipmap/ic_icon_email"
+            android:layout_gravity="center_vertical"
+            android:alpha="0.4"
+            android:paddingRight="15dp"
+            android:paddingLeft="25dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/person_email"
+            android:hint="@string/email_empty"
+            android:layout_rowSpan="1"
+            android:layout_row="4"
+            android:layout_columnSpan="1"
+            android:layout_column="1"
+            android:layout_marginRight="86dp"
+            android:textSize="20dp"
+            android:paddingLeft="5dp"
+            android:textColor="#666666"/>
+
+    </GridLayout>
+
+</LinearLayout>

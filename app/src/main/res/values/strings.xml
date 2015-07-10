@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-
     <string name="app_name">ShareWear</string>
 
     <!-- Actions -->
@@ -17,6 +16,14 @@
 
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
+
+    <!-- WelcomeActivity -->
+    <string name="welcome_title">Welcome to ShareWear</string>
+    <string name="welcome_info">
+        First set up your local phone account profile and add a name, phone number, and email.
+        This information can be shared with new contacts.
+    </string>
+    <string name="welcome_button">Go to Profile Setup</string>
 
     <!-- ContactsListActivity -->
     <string name="favorites">Favorites</string>
@@ -39,6 +46,10 @@
     <string name="input_phone">Phone</string>
     <string name="input_email">Email</string>
     <string name="switch_to_nfc">Switch to NFC Input</string>
+
+    <!-- ContactAddDoneActivity -->
+    <string name="phone_empty">No phone number</string>
+    <string name="email_empty">No email address</string>
 
     <!-- ContactViewActivity -->
     <string name="navigate">Navigate to current location</string>

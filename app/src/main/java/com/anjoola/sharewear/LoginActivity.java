@@ -298,15 +298,17 @@ public class LoginActivity extends ShareWearBaseActivity implements
      * @param quickly Whether or not to do this without a transition.
      */
     private void toMainActivity(boolean quickly) {
-        Intent intent = new Intent(this, ContactsListActivity.class);
-
-        if (quickly) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, 0);
-            overridePendingTransition(0, 0);
-        }
-        else {
-            startActivity(intent);
-        }
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        startActivity(intent);
+//        Intent intent = new Intent(this, ContactsListActivity.class);
+//
+//        if (quickly) {
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//            startActivityForResult(intent, 0);
+//            overridePendingTransition(0, 0);
+//        }
+//        else {
+//            startActivity(intent);
+//        }
     }
 }
