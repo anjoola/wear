@@ -1,5 +1,7 @@
 package com.anjoola.sharewear;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -15,6 +17,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 
 /**
@@ -22,7 +25,7 @@ import android.widget.SimpleCursorAdapter;
  * for contacts. Floating action button allows user to share their location.
  */
 public class ContactsListActivity extends ShareWearActivity implements
-        View.OnClickListener, OnItemClickListener {
+        SearchView.OnQueryTextListener, View.OnClickListener, OnItemClickListener {
     // Floating action button for getting current location.
     android.support.design.widget.FloatingActionButton mFab;
 
@@ -39,6 +42,10 @@ public class ContactsListActivity extends ShareWearActivity implements
 
     // For getting images for contacts.
     private ContactsImageProvider mImgProvider;
+
+    // For searching.
+    MenuItem mSearchMenuItem;
+    SearchView mSearchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +100,12 @@ public class ContactsListActivity extends ShareWearActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Hide search view if it is shown.
+        if (mSearchView.isShown()) {
+            mSearchMenuItem.collapseActionView();
+            mSearchView.setQuery("", false);
+        }
+
         MatrixCursor entry = (MatrixCursor) parent.getAdapter().getItem(position);
 
         // Send contact details over to activity.
@@ -107,6 +120,14 @@ public class ContactsListActivity extends ShareWearActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_list_menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchMenuItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) mSearchMenuItem.getActionView();
+
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.setOnQueryTextListener(this);
         return true;
     }
 
@@ -117,15 +138,22 @@ public class ContactsListActivity extends ShareWearActivity implements
                 Intent intent = new Intent(this, ContactAddNFCActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_search:
-                // TODO search
-                return true;
             case R.id.action_sign_out:
                 signOut();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 
     /**

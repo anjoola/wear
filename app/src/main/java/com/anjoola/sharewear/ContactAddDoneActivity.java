@@ -1,7 +1,9 @@
 package com.anjoola.sharewear;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -12,6 +14,10 @@ import android.widget.TextView;
  * NFC if desired.
  */
 public class ContactAddDoneActivity extends ShareWearActivity {
+    // How long to show this activity before transitioning back to the contacts
+    // listing (in milliseconds).
+    final int TRANSITION_TIME = 5 * 1000;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,15 @@ public class ContactAddDoneActivity extends ShareWearActivity {
         // Start animation.
         AnimationDrawable animation = (AnimationDrawable) checkmark.getBackground();
         animation.start();
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                Intent intent = new Intent(ContactAddDoneActivity.this,
+                        ContactsListActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }, TRANSITION_TIME);
     }
 
     @Override

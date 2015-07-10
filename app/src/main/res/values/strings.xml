@@ -26,6 +26,7 @@
     <string name="welcome_button">Go to Profile Setup</string>
 
     <!-- ContactsListActivity -->
+    <string name="search_contacts">Search Contacts</string>
     <string name="favorites">Favorites</string>
     <string name="all_contacts">All Contacts</string>
 
