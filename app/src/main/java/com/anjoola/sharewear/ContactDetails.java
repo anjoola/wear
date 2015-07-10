@@ -1,12 +1,15 @@
 package com.anjoola.sharewear;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 
 import java.io.File;
 
 /**
- * Used to encoding and decoding contact information to be sent via NFC.
+ * Used to encoding and decoding contact information.
  */
 public class ContactDetails {
     public String name;
@@ -28,25 +31,99 @@ public class ContactDetails {
         this.photo = photo;
     }
 
-    /**
-     * Get contact details for the current user, to send to a new contact via
-     * NFC.
-     *
-     * @param app Reference to the application.
-     * @return An encoded string containing the contact information.
-     */
-    public static String getMyContactDetails(ShareWearApplication app) {
-        // TODO app.googleApiClient is null if already logged in...
-        GoogleApiClient client = app.googleApiClient;
-        String name = Plus.PeopleApi.getCurrentPerson(client).getDisplayName();
-        String phone = "TODO"; // TODO how to get phone number?
-        String email = Plus.AccountApi.getAccountName(client);
-
+    @Override
+    public String toString() {
         return name + "###" + phone + "###" + email;
     }
 
+    /**
+     * Decode contact details received via NFC.
+     *
+     * @param nfcData The data received.
+     * @return The contact details associated with the NFC data.
+     */
     public static ContactDetails decodeNfcData(String nfcData) {
         String[] data = nfcData.split("###");
         return new ContactDetails(data[0], data[1], data[2]);
+    }
+
+    /**
+     * Get contact details for the current user.
+     *
+     * @param context Reference to the current context.
+     * @return An encoded string containing the contact information.
+     */
+    public static ContactDetails getMyContactDetails(Context context) {
+        // Query for this user's profile.
+        final ContentResolver content = context.getContentResolver();
+        final Cursor cursor = content.query(
+                Uri.withAppendedPath(
+                        ContactsContract.Profile.CONTENT_URI,
+                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY),
+                ProfileQuery.PROJECTION,
+
+                ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
+                        + ContactsContract.Contacts.Data.MIMETYPE + "=?",
+                new String[]{
+                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
+                },
+
+                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
+        );
+
+        String mime_type, name = null, phone = null, email = null;
+        while (cursor.moveToNext()) {
+            mime_type = cursor.getString(ProfileQuery.MIME_TYPE);
+            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE))
+                email = cursor.getString(ProfileQuery.EMAIL);
+            else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE))
+                name = cursor.getString(ProfileQuery.GIVEN_NAME) + " " + cursor.getString(ProfileQuery.FAMILY_NAME);
+            else if (mime_type.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE))
+                phone = cursor.getString(ProfileQuery.PHONE_NUMBER);
+            // TODO contact photo
+            // else if (mime_type.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE))
+            //photo???
+            // user_profile.addPossiblePhoto(Uri.parse(cursor.getString(ProfileQuery.PHOTO)));
+        }
+        cursor.close();
+
+        return new ContactDetails(name, phone, email);
+    }
+
+    /**
+     * Returns null if any field is missing.
+     */
+    public static String getMyContactDetailsStrict(Context context) {
+        ContactDetails details = getMyContactDetails(context);
+        if (details.name == null || details.phone == null || details.email == null)
+            return null;
+        return details.toString();
+    }
+
+    /**
+     * Used for getting user profile information.
+     */
+    private interface ProfileQuery {
+        // Columns to extract from the profile query results.
+        String[] PROJECTION = {
+                ContactsContract.CommonDataKinds.Email.ADDRESS,
+                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Photo.PHOTO_URI,
+                ContactsContract.Contacts.Data.MIMETYPE
+        };
+
+        int EMAIL = 0;
+        int FAMILY_NAME = 1;
+        int GIVEN_NAME = 2;
+        int PHONE_NUMBER = 3;
+        int PHOTO = 4;
+        int MIME_TYPE = 5;
     }
 }

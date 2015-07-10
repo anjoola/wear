@@ -100,7 +100,7 @@ public class ContactAddActivity extends ShareWearActivity implements
 
             // Hide the NFC input button.
             LinearLayout buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
-            buttonLayout.setVisibility(0);
+            buttonLayout.setVisibility(View.INVISIBLE);
         }
     }
 

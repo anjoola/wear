@@ -20,7 +20,7 @@
     <!-- WelcomeActivity -->
     <string name="welcome_title">Welcome to ShareWear</string>
     <string name="welcome_info">
-        First set up your local phone account profile and add a name, phone number, and email.
+        Set up your local profile to have a name, phone number, and email.
         This information can be shared with new contacts.
     </string>
     <string name="welcome_button">Go to Profile Setup</string>

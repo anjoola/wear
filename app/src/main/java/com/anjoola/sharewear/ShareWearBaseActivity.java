@@ -36,6 +36,7 @@ public class ShareWearBaseActivity extends FragmentActivity {
         mPrefEditor.commit();
     }
 
+    // Contact details for the user.
     public String prefGetContactDetails() {
         return mPref.getString(getString(R.string.pref_contact_details), null);
     }

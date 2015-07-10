@@ -1,7 +1,5 @@
 package com.anjoola.sharewear;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -9,9 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,9 +26,6 @@ public class ContactsListActivity extends ShareWearActivity implements
     // Floating action button for getting current location.
     android.support.design.widget.FloatingActionButton mFab;
 
-    // ListView to display all contacts.
-    private ListView mContactsList;
-
     // Adapter for mapping contacts to objects in the ListViews.
     private SimpleCursorAdapter mFavoritesAdapter, mAdapter;
     private DoubleListAdapter mDoubleAdapter;
@@ -47,95 +40,10 @@ public class ContactsListActivity extends ShareWearActivity implements
     // For getting images for contacts.
     private ContactsImageProvider mImgProvider;
 
-    /**
-     * Contacts user profile query interface.
-     */
-    private interface ProfileQuery {
-        /** The set of columns to extract from the profile query results */
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.IS_PRIMARY,
-                ContactsContract.CommonDataKinds.Photo.PHOTO_URI,
-                ContactsContract.Contacts.Data.MIMETYPE
-        };
-
-        /** Column index for the email address in the profile query results */
-        int EMAIL = 0;
-        /** Column index for the primary email address indicator in the profile query results */
-        int IS_PRIMARY_EMAIL = 1;
-        /** Column index for the family name in the profile query results */
-        int FAMILY_NAME = 2;
-        /** Column index for the given name in the profile query results */
-        int GIVEN_NAME = 3;
-        /** Column index for the phone number in the profile query results */
-        int PHONE_NUMBER = 4;
-        /** Column index for the primary phone number in the profile query results */
-        int IS_PRIMARY_PHONE_NUMBER = 5;
-        /** Column index for the photo in the profile query results */
-        int PHOTO = 6;
-        /** Column index for the MIME type in the profile query results */
-        int MIME_TYPE = 7;
-    }
-
-    private static String getUserProfileOnIcsDevice(Context context) {
-        final ContentResolver content = context.getContentResolver();
-        final Cursor cursor = content.query(
-                // Retrieves data rows for the device user's 'profile' contact
-                Uri.withAppendedPath(
-                        ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY),
-                ProfileQuery.PROJECTION,
-
-                // Selects only email addresses or names
-                ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=?",
-                new String[]{
-                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
-                },
-
-                // Show primary rows first. Note that there won't be a primary email address if the
-                // user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
-        );
-
-        String stuff = "";
-        String mime_type;
-        while (cursor.moveToNext()) {
-            mime_type = cursor.getString(ProfileQuery.MIME_TYPE);
-            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE))
-                stuff += cursor.getString(ProfileQuery.EMAIL);
-            else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE))
-                stuff += cursor.getString(ProfileQuery.GIVEN_NAME) + " " + cursor.getString(ProfileQuery.FAMILY_NAME);
-            else if (mime_type.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE))
-                stuff += cursor.getString(ProfileQuery.PHONE_NUMBER);
-           // else if (mime_type.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE))
-                //photo???
-               // user_profile.addPossiblePhoto(Uri.parse(cursor.getString(ProfileQuery.PHOTO)));
-        }
-
-        cursor.close();
-
-        return stuff;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_list_activity);
-
-
-        String result = getUserProfileOnIcsDevice(this);
-        Log.e("----", result);
-
 
         // Set up handler for getting current location floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
@@ -144,12 +52,11 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         mImgProvider = new ContactsImageProvider(getBaseContext());
 
-        // TODO
         // Set up contacts list view. Set adapter and scroll listener for
         // infinite scrolling.
-        mContactsList = (ListView) findViewById(R.id.contacts_list);
-        mContactsList.setOnScrollListener(new EndlessScrollListener());
-        mContactsList.setOnItemClickListener(this);
+        ListView contactsList = (ListView) findViewById(R.id.contacts_list);
+        contactsList.setOnScrollListener(new EndlessScrollListener());
+        contactsList.setOnItemClickListener(this);
 
         mFavoritesAdapter = new SimpleCursorAdapter(this,
                 R.layout.contacts_list_view_favorite,
@@ -161,22 +68,12 @@ public class ContactsListActivity extends ShareWearActivity implements
                 null,
                 new String[] { "photo", "name" },
                 new int[] { R.id.photo, R.id.name }, 0);
-
-        // TODO
-        /*
-        mAdapter = new SimpleCursorAdapter(getBaseContext(),
-                R.layout.contacts_list_view_layout,
-                null,
-                new String[] { "photo", "name", "phone", "email" },
-                new int[] { R.id.photo, R.id.name, R.id.phone, R.id.email }, 0);*/
-        //mContactsList.setAdapter(mAdapter);
-
         mDoubleAdapter = new DoubleListAdapter(this,
                 getString(R.string.favorites), mFavoritesAdapter,
                 getString(R.string.all_contacts), mAdapter);
-        mContactsList.setAdapter(mDoubleAdapter);
+        contactsList.setAdapter(mDoubleAdapter);
 
-        // TODO
+        // Cursor for loading all details.
         mMatrixCursor = new MatrixCursor(
                 new String[] {"_id", "photo", "name", "phone", "email"});
         runOnUiThread(new Runnable() {
@@ -221,7 +118,7 @@ public class ContactsListActivity extends ShareWearActivity implements
                 startActivity(intent);
                 return true;
             case R.id.action_search:
-                // TODO
+                // TODO search
                 return true;
             case R.id.action_sign_out:
                 signOut();
@@ -292,10 +189,10 @@ public class ContactsListActivity extends ShareWearActivity implements
          */
         private void getContactDetails(Cursor cursor, long contactId) {
             // Details to retrieve.
-            String displayName = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.Data.DISPLAY_NAME));
             String photoUri = cursor.getString(cursor.getColumnIndex(
                     Phone.PHOTO_URI));
+            String name = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.Contacts.DISPLAY_NAME));
             String phone = null;
             String email = null;
 
@@ -325,16 +222,16 @@ public class ContactsListActivity extends ShareWearActivity implements
                 }
 
                 // Email.
-                if (columnType.equals(Email.CONTENT_ITEM_TYPE)) {
+                if (columnType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
                     switch (cursor.getInt(cursor.getColumnIndex("data2"))) {
-                        case Email.TYPE_HOME:
+                        case ContactsContract.CommonDataKinds.Email.TYPE_HOME:
                             email = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
-                        case Email.TYPE_WORK:
+                        case ContactsContract.CommonDataKinds.Email.TYPE_WORK:
                             if (email == null)
                                 email = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
-                        case Email.TYPE_OTHER:
+                        case ContactsContract.CommonDataKinds.Email.TYPE_OTHER:
                             if (email == null)
                                 email = cursor.getString(cursor.getColumnIndex("data1"));
                             break;
@@ -347,13 +244,13 @@ public class ContactsListActivity extends ShareWearActivity implements
 
             // Get default photo if contact photo does not exist.
             if (photoUri == null)
-                photoUri = mImgProvider.getDefaultContactUri(displayName);
+                photoUri = mImgProvider.getDefaultContactUri(name);
 
             // Add contact details to cursor.
             mMatrixCursor.addRow(new Object[]{
                     Long.toString(contactId),
                     photoUri,
-                    displayName,
+                    name,
                     phone,
                     email
             });

@@ -11,7 +11,7 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="220dp"
         android:id="@+id/background"
         android:src="@mipmap/nfc_blank"
         android:layout_alignParentTop="true"
@@ -33,15 +33,16 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="150dp"
+            android:layout_height="140dp"
             android:id="@+id/welcome_image"
             android:src="@mipmap/contact_card"
             android:layout_alignParentTop="true"
             android:layout_gravity="center_horizontal|top"
             android:background="#ff69ede0"
             android:adjustViewBounds="false"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            />
 
         <TextView
             android:layout_width="fill_parent"
