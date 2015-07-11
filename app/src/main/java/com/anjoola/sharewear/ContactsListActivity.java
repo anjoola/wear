@@ -10,13 +10,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 
@@ -47,6 +47,12 @@ public class ContactsListActivity extends ShareWearActivity implements
     MenuItem mSearchMenuItem;
     SearchView mSearchView;
 
+
+    // TODO
+    ViewPager pager;
+    ViewPagerAdapter adapter;
+    SlidingTabLayout tabs;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,15 +61,15 @@ public class ContactsListActivity extends ShareWearActivity implements
         // Set up handler for getting current location floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
                 findViewById(R.id.fab_my_location);
-        mFab.setOnClickListener(this);
+        //mFab.setOnClickListener(this);
 
         mImgProvider = new ContactsImageProvider(getBaseContext());
 
         // Set up contacts list view. Set adapter and scroll listener for
         // infinite scrolling.
-        ListView contactsList = (ListView) findViewById(R.id.contacts_list);
-        contactsList.setOnScrollListener(new EndlessScrollListener());
-        contactsList.setOnItemClickListener(this);
+       // ListView contactsList = (ListView) findViewById(R.id.contacts_list);
+       // contactsList.setOnScrollListener(new EndlessScrollListener());
+       // contactsList.setOnItemClickListener(this);
 
         mFavoritesAdapter = new SimpleCursorAdapter(this,
                 R.layout.contacts_list_view_favorite,
@@ -78,7 +84,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         mDoubleAdapter = new DoubleListAdapter(this,
                 getString(R.string.favorites), mFavoritesAdapter,
                 getString(R.string.all_contacts), mAdapter);
-        contactsList.setAdapter(mDoubleAdapter);
+       // contactsList.setAdapter(mDoubleAdapter);
 
         // Cursor for loading all details.
         mMatrixCursor = new MatrixCursor(
@@ -88,6 +94,47 @@ public class ContactsListActivity extends ShareWearActivity implements
                 new ContactsListLoader(0).execute();
             }
         });
+
+        //contactsList.setFastScrollEnabled(true);
+       // contactsList.setTextFilterEnabled(true);
+
+        mAdapter.getFilter().filter("aaa");
+
+        getActionBar().setElevation(0);
+
+        // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles
+        // fot the Tabs and Number Of Tabs.
+        CharSequence Titles[] = {
+                getString(R.string.favorites),
+                getString(R.string.all_contacts)
+        };
+        adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles);
+
+
+
+
+        // Assigning ViewPager View and setting the adapter
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+
+        // Assiging the Sliding Tab Layout View
+        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabs.setDistributeEvenly(true);
+
+
+
+        // Setting Custom Color for the Scroll bar indicator of the Tab View
+//        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+//            @Override
+//            public int getIndicatorColor(int position) {
+//
+//                return R.color.Black;
+//            }
+//        });
+
+        // Setting the ViewPager For the SlidingTabsLayout
+        tabs.setViewPager(pager);
+
     }
 
     @Override

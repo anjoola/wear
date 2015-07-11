@@ -21,13 +21,27 @@
         app:elevation="4dp"
         app:pressedTranslationZ="12dp"
         app:fabSize="normal"
-        app:backgroundTint="#FF4081"
+        app:backgroundTint="#F05140"
         app:rippleColor="#ffffbabf" />
 
-    <ListView
-        android:id="@+id/contacts_list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <com.anjoola.sharewear.SlidingTabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#009688"
+            android:elevation="3dp" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
 </RelativeLayout>
