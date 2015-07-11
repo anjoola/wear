@@ -26,6 +26,9 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.anjoola.sharewear.util.ContactDetails;
+import com.anjoola.sharewear.util.RoundedImageView;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;

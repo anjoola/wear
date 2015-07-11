@@ -9,6 +9,9 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.anjoola.sharewear.util.ContactDetails;
+import com.anjoola.sharewear.util.RoundedImageView;
+
 /**
  * Activity to add new contact information manually. Can switch to input via
  * NFC if desired.

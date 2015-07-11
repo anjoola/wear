@@ -13,7 +13,7 @@
             android:layout_columnWeight="100"
             android:layout_gravity="center_horizontal">
 
-    <com.anjoola.sharewear.RoundedImageView
+    <com.anjoola.sharewear.util.RoundedImageView
         android:id="@+id/photo2"
         android:layout_width="90dp"
         android:layout_height="90dp"

@@ -10,11 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 
+import com.anjoola.sharewear.util.SlidingTabLayout;
+import com.anjoola.sharewear.util.ViewPagerAdapter;
+
 /**
  * Displays list of contacts and favorites. Allows user to add and search
  * for contacts. Floating action button allows user to share their location.
  *
- * Tab layout courtesy of http://www.tutorialsbuzz.com/2015/04/Android-Material-Design-Sliding-TabLayout.html.
+ * Tab layout courtesy of
+ * http://www.tutorialsbuzz.com/2015/04/Android-Material-Design-Sliding-TabLayout.html.
  */
 public class ContactsListActivity extends ShareWearActivity implements
         SearchView.OnQueryTextListener, View.OnClickListener {

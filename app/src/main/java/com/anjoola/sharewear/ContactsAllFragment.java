@@ -17,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.anjoola.sharewear.util.ContactsImageProvider;
+
 public class ContactsAllFragment extends Fragment implements
         AdapterView.OnItemClickListener {
     // Adapter for mapping contacts to objects in the ListViews.
@@ -47,7 +49,7 @@ public class ContactsAllFragment extends Fragment implements
         contactsList.setOnItemClickListener(this);
 
         mAdapter = new SimpleCursorAdapter(getActivity(),
-                R.layout.contacts_list_view_layout,
+                R.layout.contacts_list_view_all,
                 null,
                 new String[] { "photo", "name" },
                 new int[] { R.id.photo, R.id.name }, 0);

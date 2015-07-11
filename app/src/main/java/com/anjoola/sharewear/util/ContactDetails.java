@@ -1,4 +1,4 @@
-package com.anjoola.sharewear;
+package com.anjoola.sharewear.util;
 
 import android.content.ContentResolver;
 import android.content.Context;

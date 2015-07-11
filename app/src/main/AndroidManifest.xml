@@ -37,7 +37,7 @@
         android:theme="@style/ShareWearTheme"
         android:name=".ShareWearApplication">
 
-        <service android:name="KillNotificationService" />
+        <service android:name=".util.KillNotificationService" />
 
         <activity
             android:name=".LoginActivity"

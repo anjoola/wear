@@ -1,8 +1,11 @@
-package com.anjoola.sharewear;
+package com.anjoola.sharewear.util;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.anjoola.sharewear.ContactsAllFragment;
+import com.anjoola.sharewear.ContactsFavoriteFragment;
 
 /**
  * Used for displaying different views in the sliding tab layout.

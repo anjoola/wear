@@ -1,4 +1,4 @@
-package com.anjoola.sharewear;
+package com.anjoola.sharewear.util;
 
 import android.graphics.Color;
 import android.location.Location;

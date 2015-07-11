@@ -29,6 +29,10 @@
     <string name="search_contacts">Search Contacts</string>
     <string name="favorites">Favorites</string>
     <string name="all_contacts">All Contacts</string>
+    <string name="no_favorites">No Favorites</string>
+    <string name="no_favorites_desc">
+        Add a contact to Favorites by starring them on their info page.
+    </string>
 
     <!-- ContactAddNFCActivity -->
     <string name="nfc_description">

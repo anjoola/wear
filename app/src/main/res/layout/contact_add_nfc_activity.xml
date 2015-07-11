@@ -40,8 +40,7 @@
             android:layout_gravity="center_horizontal|top"
             android:background="#ff69ede0"
             android:adjustViewBounds="false"
-            android:layout_marginTop="15dp"
-            />
+            android:layout_marginTop="15dp" />
 
         <TextView
             android:layout_width="fill_parent"

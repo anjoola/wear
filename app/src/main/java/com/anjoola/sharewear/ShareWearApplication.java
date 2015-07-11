@@ -2,6 +2,7 @@ package com.anjoola.sharewear;
 
 import android.app.Application;
 
+import com.anjoola.sharewear.util.ContactDetails;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 /**

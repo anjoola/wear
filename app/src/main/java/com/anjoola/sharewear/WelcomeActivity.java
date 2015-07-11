@@ -7,6 +7,8 @@ import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 
+import com.anjoola.sharewear.util.ContactDetails;
+
 /**
  * Welcome screen. Has the user edit their local profile if it isn't completely
  * set up yet.

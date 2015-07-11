@@ -10,7 +10,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
 
-    <com.anjoola.sharewear.RoundedImageView
+    <com.anjoola.sharewear.util.RoundedImageView
         android:id="@+id/photo"
         android:layout_width="45dp"
         android:layout_height="45dp"

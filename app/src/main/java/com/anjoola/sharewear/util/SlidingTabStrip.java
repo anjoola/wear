@@ -1,4 +1,4 @@
-package com.anjoola.sharewear;
+package com.anjoola.sharewear.util;
 
 /*
  * Copyright 2014 Google Inc. All rights reserved.
