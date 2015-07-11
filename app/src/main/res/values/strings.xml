@@ -14,6 +14,10 @@
     <string name="go_to_settings">Go to Settings</string>
     <string name="contact_details">Contact Details</string>
 
+    <!-- Notifications -->
+    <string name="request_title">Location request</string>
+    <string name="request_message">is requesting your location</string>
+
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
 
@@ -91,5 +95,7 @@
     <!-- Preferences -->
     <string name="pref_user">pref_user</string>
     <string name="pref_contact_details">pref_contact_details</string>
+
+    <string name="SENDER_ID">283481130565</string>
 
 </resources>

@@ -73,7 +73,6 @@ public class MyLocationActivity extends ShareWearActivity implements
     private Toast mShareOnToast, mShareOffToast;
 
     // Used for a persistent notification when location sharing starts.
-    public static int NOTIFICATION_ID = 399399;
     private Notification mNotification;
     private NotificationManager mNotificationManager;
     private ServiceConnection mConnection;
@@ -339,7 +338,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         mShareOffToast.show();
 
         // Hide the notification.
-        mNotificationManager.cancel(NOTIFICATION_ID);
+        mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
         stopService(mKillIntent);
         unbindService(mConnection);
     }
@@ -380,8 +379,8 @@ public class MyLocationActivity extends ShareWearActivity implements
 
             // Make it so the activity starts at the top of the stack.
             stackBuilder.addNextIntent(resultIntent);
-            PendingIntent pendingIntent =
-                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = stackBuilder.getPendingIntent(0,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
 
             mNotification = builder.build();
@@ -390,7 +389,8 @@ public class MyLocationActivity extends ShareWearActivity implements
                 @Override
                 public void onServiceConnected(ComponentName className,
                                                IBinder binder) {
-                    mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+                    mNotificationManager.notify(
+                            ShareWearApplication.NOTIFICATION_ID, mNotification);
                 }
 
                 @Override
