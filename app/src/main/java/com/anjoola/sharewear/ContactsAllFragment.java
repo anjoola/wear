@@ -25,7 +25,6 @@ public class ContactsAllFragment extends Fragment implements
     private SimpleCursorAdapter mAdapter;
 
     // Asynchronous task to retrieve and load ListView with contacts.
-    private ContactsListLoader mLoader;
     private MatrixCursor mMatrixCursor;
 
     // Number of contacts to load at once.

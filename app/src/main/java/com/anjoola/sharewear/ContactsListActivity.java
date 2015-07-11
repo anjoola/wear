@@ -21,7 +21,8 @@ import com.anjoola.sharewear.util.ViewPagerAdapter;
  * http://www.tutorialsbuzz.com/2015/04/Android-Material-Design-Sliding-TabLayout.html.
  */
 public class ContactsListActivity extends ShareWearActivity implements
-        SearchView.OnQueryTextListener, View.OnClickListener {
+        SearchView.OnQueryTextListener, View.OnClickListener,
+        ViewPager.OnPageChangeListener {
     // Floating action button for getting current location.
     android.support.design.widget.FloatingActionButton mFab;
 
@@ -57,6 +58,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
         tabs.setViewPager(pager);
+        tabs.setOnPageChangeListener(this);
     }
 
     @Override
@@ -77,6 +79,7 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setOnQueryTextListener(this);
+        mSearchMenuItem.setVisible(false);
         return true;
     }
 
@@ -104,6 +107,21 @@ public class ContactsListActivity extends ShareWearActivity implements
     public boolean onQueryTextChange(String newText) {
         return false;
     }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset,
+                               int positionOffsetPixels) { }
+
+    @Override
+    public void onPageSelected(int position) {
+        // Hide search view in favorites page.
+        mSearchMenuItem.setVisible(position != 0);
+        if (position == 0)
+            mSearchMenuItem.collapseActionView();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) { }
 
     /**
      * Hides the search view if it is shown.
