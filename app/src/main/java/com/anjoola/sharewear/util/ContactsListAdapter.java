@@ -61,7 +61,8 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
         final ContactDetails user = (ContactDetails) getItem(position);
 
         if (view == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater)
+                    activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.contacts_list_view_all, parent, false);
             holder = new ViewHolder();
             holder.photo = (ImageView) view.findViewById(R.id.photo);
@@ -112,7 +113,6 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
                         tempList.add(user);
                     }
                 }
-
                 filterResults.count = tempList.size();
                 filterResults.values = tempList;
             }

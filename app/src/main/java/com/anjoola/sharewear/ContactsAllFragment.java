@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 public class ContactsAllFragment extends Fragment implements
         AdapterView.OnItemClickListener {
     // Adapter for mapping contacts to objects in the ListViews.
-    private ContactsListAdapter mAdapter;
+    public ContactsListAdapter mAdapter;
 
     // List of all contacts.
     private ArrayList<ContactDetails> mContactsList;
@@ -46,10 +45,8 @@ public class ContactsAllFragment extends Fragment implements
 
         mImgProvider = new ContactsImageProvider(getActivity().getBaseContext());
 
-        // Set up contacts list view. Set adapter and scroll listener for
-        // infinite scrolling.
+        // Set up contacts list view and adapter.
         ListView contactsList = (ListView) v.findViewById(R.id.contacts_list_all);
-//        contactsList.setOnScrollListener(new EndlessScrollListener());
         contactsList.setOnItemClickListener(this);
 
         mContactsList = new ArrayList<ContactDetails>();
@@ -65,9 +62,6 @@ public class ContactsAllFragment extends Fragment implements
 
         //contactsList.setFastScrollEnabled(true);
         // contactsList.setTextFilterEnabled(true);
-
-//        mAdapter.getFilter().filter("aaa");
-
         return v;
     }
 
@@ -80,7 +74,7 @@ public class ContactsAllFragment extends Fragment implements
 
         // Send contact details over to activity.
         Intent intent = new Intent(getActivity(), ContactViewActivity.class);
-        intent.putExtra(ShareWearActivity.PHOTO, entry.photo); // TODO should be photoUri
+        intent.putExtra(ShareWearActivity.PHOTO, entry.photoUri);
         intent.putExtra(ShareWearActivity.NAME, entry.name);
         intent.putExtra(ShareWearActivity.PHONE, entry.phone);
         intent.putExtra(ShareWearActivity.EMAIL, entry.email);
@@ -214,35 +208,5 @@ public class ContactsAllFragment extends Fragment implements
 
             mContactsList.add(new ContactDetails(name, phone, email, photoUri));
         }
-    }
-
-    // TODO, doesn't work
-    private class EndlessScrollListener implements AbsListView.OnScrollListener {
-        // Offset loaded.
-        private int offset = 0;
-
-        private int previousTotal = 0;
-        private boolean loading = false;
-
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem,
-                             int visibleItemCount, int totalItemCount) {
-            if (loading && totalItemCount > previousTotal) {
-                loading = false;
-            }
-            if (!loading && (firstVisibleItem + visibleItemCount - 2 >= previousTotal + LOAD_NUM - 10)) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        new ContactsListLoader(++offset, LOAD_NUM).execute();
-                        previousTotal += LOAD_NUM;
-                        loading = true;
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) { }
     }
 }

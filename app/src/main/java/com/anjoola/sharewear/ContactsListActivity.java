@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ public class ContactsListActivity extends ShareWearActivity implements
     android.support.design.widget.FloatingActionButton mFab;
 
     // For searching.
+    Fragment mFragment;
     MenuItem mSearchMenuItem;
     SearchView mSearchView;
 
@@ -59,6 +61,8 @@ public class ContactsListActivity extends ShareWearActivity implements
         pager.setAdapter(adapter);
         tabs.setViewPager(pager);
         tabs.setOnPageChangeListener(this);
+
+        mFragment = adapter.second;
     }
 
     @Override
@@ -73,12 +77,14 @@ public class ContactsListActivity extends ShareWearActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_list_menu, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager)
+                getSystemService(Context.SEARCH_SERVICE);
         mSearchMenuItem = menu.findItem(R.id.action_search);
         mSearchView = (SearchView) mSearchMenuItem.getActionView();
 
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setOnQueryTextListener(this);
+        mSearchView.setQueryHint(getString(R.string.search_contacts));
         mSearchMenuItem.setVisible(false);
         return true;
     }
@@ -105,7 +111,9 @@ public class ContactsListActivity extends ShareWearActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        return false;
+        // Filter contacts.
+        ((ContactsAllFragment) mFragment).mAdapter.getFilter().filter(newText);
+        return true;
     }
 
     @Override
