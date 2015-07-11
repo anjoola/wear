@@ -5,6 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 
 import java.io.File;
 
@@ -16,12 +21,14 @@ public class ContactDetails {
     public String phone;
     public String email;
     public File photo;
+    public String photoUri;
 
     public ContactDetails(String name, String phone, String email) {
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.photo = null;
+        this.photoUri = null;
     }
 
     public ContactDetails(String name, String phone, String email, File photo) {
@@ -29,6 +36,16 @@ public class ContactDetails {
         this.phone = phone;
         this.email = email;
         this.photo = photo;
+        this.photoUri = null;
+    }
+
+    public ContactDetails(String name, String phone, String email,
+                          String photoUri) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.photo = null;
+        this.photoUri = photoUri;
     }
 
     @Override
@@ -63,27 +80,28 @@ public class ContactDetails {
                 ProfileQuery.PROJECTION,
 
                 ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
-                        + ContactsContract.Contacts.Data.MIMETYPE + "=?",
+                        + Data.MIMETYPE + "=? OR "
+                        + Data.MIMETYPE + "=? OR "
+                        + Data.MIMETYPE + "=?",
                 new String[]{
-                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
+                        Email.CONTENT_ITEM_TYPE,
+                        StructuredName.CONTENT_ITEM_TYPE,
+                        Phone.CONTENT_ITEM_TYPE,
+                        Photo.CONTENT_ITEM_TYPE
                 },
-
                 ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
         );
 
+        // Get the data.
         String mime_type, name = null, phone = null, email = null;
         while (cursor.moveToNext()) {
             mime_type = cursor.getString(ProfileQuery.MIME_TYPE);
-            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE))
+            if (mime_type.equals(Email.CONTENT_ITEM_TYPE))
                 email = cursor.getString(ProfileQuery.EMAIL);
-            else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE))
-                name = cursor.getString(ProfileQuery.GIVEN_NAME) + " " + cursor.getString(ProfileQuery.FAMILY_NAME);
-            else if (mime_type.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE))
+            else if (mime_type.equals(StructuredName.CONTENT_ITEM_TYPE))
+                name = cursor.getString(ProfileQuery.GIVEN_NAME) + " " +
+                        cursor.getString(ProfileQuery.FAMILY_NAME);
+            else if (mime_type.equals(Phone.CONTENT_ITEM_TYPE))
                 phone = cursor.getString(ProfileQuery.PHONE_NUMBER);
             // TODO contact photo
             // else if (mime_type.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE))
@@ -111,11 +129,11 @@ public class ContactDetails {
     private interface ProfileQuery {
         // Columns to extract from the profile query results.
         String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Photo.PHOTO_URI,
+                Email.ADDRESS,
+                StructuredName.FAMILY_NAME,
+                StructuredName.GIVEN_NAME,
+                Phone.NUMBER,
+                Photo.PHOTO_URI,
                 ContactsContract.Contacts.Data.MIMETYPE
         };
 
