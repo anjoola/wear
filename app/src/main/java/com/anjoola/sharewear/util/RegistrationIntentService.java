@@ -57,11 +57,17 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         try {
+            // Get details for this user.
+            String details = ((ShareWearApplication) getApplication()).myDetails;
+            ContactDetails info = ContactDetails.decodeNfcData(details);
+
             // Construct request.
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.NEW_USER);
             json.put(ServerField.USER_ID, token);
-            json.put(ServerField.NAME, "test"); // TODO
+            json.put(ServerField.NAME, info.name);
+            json.put(ServerField.PHONE, info.phone);
+            json.put(ServerField.EMAIL, info.email);
             ServerConnection.doPost(json);
         }
         // TODO

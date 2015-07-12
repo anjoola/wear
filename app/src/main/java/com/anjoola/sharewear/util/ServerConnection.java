@@ -20,13 +20,13 @@ public class ServerConnection {
     private static DefaultHttpClient client;
 
     /**
-     * Instantiate the server client. Must be called once.
+     * Does a POST request to the server with the given JSON data.
+     * @param json Data to send to server.
      */
-    public static void instantiate() {
-        client = new DefaultHttpClient();
-    }
-
     public static void doPost(JSONObject json) {
+        if (client == null)
+            client = new DefaultHttpClient();
+
         // Create POST request.
         HttpPost request = new HttpPost(SERVER_URL);
         try {

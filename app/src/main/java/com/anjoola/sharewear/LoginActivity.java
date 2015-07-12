@@ -13,8 +13,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import com.anjoola.sharewear.util.RegistrationIntentService;
-import com.anjoola.sharewear.util.ServerConnection;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
@@ -78,7 +76,6 @@ public class LoginActivity extends ShareWearBaseActivity implements
         // Initialize Google API client and server connection.
         mApp = (ShareWearApplication) getApplication();
         mApp.googleApiClient = buildGoogleApiClient();
-        ServerConnection.instantiate();
 
         // Did we come from a sign out? If so, actually sign out.
         Intent intent = getIntent();
@@ -159,10 +156,6 @@ public class LoginActivity extends ShareWearBaseActivity implements
     public void onConnected(Bundle connectionHint) {
         mSignInProgress = STATE_DEFAULT;
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mApp.googleApiClient);
-
-        // Register with the cloud server.
-        Intent intent = new Intent(this, RegistrationIntentService.class);
-        startService(intent);
 
         // Save user details for next startup.
         prefSetUser(currentUser.getId());

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.anjoola.sharewear.util.ContactDetails;
+import com.anjoola.sharewear.util.RegistrationIntentService;
 
 /**
  * Welcome screen. Has the user edit their local profile if it isn't completely
@@ -43,12 +44,20 @@ public class WelcomeActivity extends ShareWearActivity implements
     public void onStart() {
         super.onStart();
 
-        // See if the profile setup is done. If so, move on to show the contacts
-        // listing.
+        // See if the profile setup is done.
         String details = ContactDetails.getMyContactDetailsStrict(this);
         if (details != null && (buttonClicked || prefGetContactDetails() != null)) {
             prefSetContactDetails(details);
+            ((ShareWearApplication) getApplication()).myDetails = details;
+
+            // Register this user with the cloud server.
+            Intent service = new Intent(this, RegistrationIntentService.class);
+            startService(service);
+
+            // Show contacts listing.
             Intent intent = new Intent(this, ContactsListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                    Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
     }

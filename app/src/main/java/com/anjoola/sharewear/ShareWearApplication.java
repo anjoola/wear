@@ -26,6 +26,9 @@ public class ShareWearApplication extends Application {
     // Contact details for a newly-created contact.
     public ContactDetails newContactDetails;
 
+    // Contact details for the current users.
+    public String myDetails = null;
+
     public boolean isLocationSharingOn() {
         return locationSharingOn;
     }
