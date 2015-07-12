@@ -30,3 +30,7 @@ Thumbs.db
 .idea
 .gradle
 build/
+
+# Python files
+*.pyc
+secret.py
