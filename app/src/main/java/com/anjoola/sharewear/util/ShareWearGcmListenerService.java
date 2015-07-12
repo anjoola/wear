@@ -40,7 +40,7 @@ public class ShareWearGcmListenerService extends GcmListenerService {
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_action_share)
-                .setContentTitle(getString(R.string.request_title))
+                .setContentTitle(getString(R.string.app_name))
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(sound)

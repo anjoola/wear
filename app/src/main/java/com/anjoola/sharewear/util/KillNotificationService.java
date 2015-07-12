@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.anjoola.sharewear.MyLocationActivity;
+import com.anjoola.sharewear.ShareWearApplication;
 
 /**
  * Kills the app's notification if the app is also killed.
@@ -36,6 +36,6 @@ public class KillNotificationService extends Service {
     public void onCreate() {
         NotificationManager manager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(MyLocationActivity.NOTIFICATION_ID);
+        manager.cancel(ShareWearApplication.NOTIFICATION_ID);
     }
 }

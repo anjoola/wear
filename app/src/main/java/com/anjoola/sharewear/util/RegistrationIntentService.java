@@ -9,6 +9,8 @@ import com.anjoola.sharewear.ShareWearApplication;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import org.json.JSONObject;
+
 /**
  * Get registration ID and send to server.
  */
@@ -35,7 +37,7 @@ public class RegistrationIntentService extends IntentService {
 
                 // Check to see if we need to send the token to the server.
                 ShareWearApplication app = (ShareWearApplication) getApplication();
-                if (app.getGcmToken() == null || !app.getGcmToken().equals(token))
+                //if (app.getGcmToken() == null || !app.getGcmToken().equals(token))
                     sendRegistrationToServer(token);
 
                 app.setGcmToken(token);
@@ -50,10 +52,21 @@ public class RegistrationIntentService extends IntentService {
     }
 
     /**
-     * Persist registration to cloud server.
+     * Persist registration to cloud server. Send a POST request.
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
+        try {
+            // Construct request.
+            JSONObject json = new JSONObject();
+            json.put(ServerField.COMMAND, ServerField.NEW_USER);
+            json.put(ServerField.USER_ID, token);
+            json.put(ServerField.NAME, "test"); // TODO
+            ServerConnection.doPost(json);
+        }
         // TODO
+        catch (Exception e) {
+            Log.e("----", e.toString());
+        }
     }
 }
