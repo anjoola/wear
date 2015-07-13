@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.anjoola.sharewear.util.ContactDetails;
-import com.anjoola.sharewear.util.RoundedImageView;
 
 /**
  * Activity to add new contact information manually. Can switch to input via
@@ -29,8 +28,6 @@ public class ContactAddDoneActivity extends ShareWearActivity {
         TextView name = (TextView) findViewById(R.id.person_name);
         TextView phone = (TextView) findViewById(R.id.person_phone);
         TextView email = (TextView) findViewById(R.id.person_email);
-
-        RoundedImageView photo = (RoundedImageView) findViewById(R.id.contact_photo);
         ImageView checkmark = (ImageView) findViewById(R.id.checkmark);
 
         // Set fields.
@@ -39,17 +36,9 @@ public class ContactAddDoneActivity extends ShareWearActivity {
         name.setText(contact.name);
         phone.setText(contact.phone);
         email.setText(contact.email);
-        if (contact.photo != null) {
-            // TODO doesn't work if there is a contact photo?
-            //Uri imageUri = Uri.fromFile(contact.photo);
-            //photo.setImageURI(imageUri);
-            checkmark.setBackgroundResource(R.drawable.checkmark);
-        }
-        else {
-            checkmark.setBackgroundResource(R.drawable.checkmark_checked);
-        }
 
         // Start animation.
+        checkmark.setBackgroundResource(R.drawable.checkmark_checked);
         AnimationDrawable animation = (AnimationDrawable) checkmark.getBackground();
         animation.start();
 

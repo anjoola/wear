@@ -229,7 +229,7 @@ public class ContactAddActivity extends ShareWearActivity implements
 
             // Show success page.
             ShareWearApplication app = (ShareWearApplication) getApplication();
-            app.newContactDetails = new ContactDetails(name, phone, email, mImageFile);
+            app.newContactDetails = new ContactDetails(name, phone, email);
             Intent intent = new Intent(this, ContactAddDoneActivity.class);
             startActivity(intent);
         }
