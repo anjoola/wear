@@ -1,12 +1,15 @@
 package com.anjoola.sharewear.util;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -21,26 +24,71 @@ public class ServerConnection {
 
     /**
      * Does a POST request to the server with the given JSON data.
+     *
      * @param json Data to send to server.
+     * @return Response from the server.
      */
     public static void doPost(JSONObject json) {
+        doPost(json, null);
+    }
+
+    /**
+     * Does a POST request to the server with the given JSON data.
+     *
+     * @param json Data to send to server.
+     * @param callback Callback to call on after response is received.
+     * @return Response from the server.
+     */
+    public static void doPost(JSONObject json, ServerConnectionCallback callback) {
         if (client == null)
             client = new DefaultHttpClient();
 
-        // Create POST request.
-        HttpPost request = new HttpPost(SERVER_URL);
-        try {
-            StringEntity entity = new StringEntity(json.toString());
-            entity.setContentType("application/json");
-            request.setEntity(entity);
+        new BackgroundNetworkTask(callback).execute(json);
+    }
 
-            // TODO
-            HttpResponse response = client.execute(request);
-            Log.e("----", EntityUtils.toString(response.getEntity()));
+    /**
+     * Used for executing the network request in the background (to avoid
+     * interfering with the main thread.
+     */
+    static class BackgroundNetworkTask extends AsyncTask<JSONObject, Void, JSONObject> {
+
+        // Callback to handle the response from the server.
+        ServerConnectionCallback callback;
+
+        public BackgroundNetworkTask(ServerConnectionCallback callback) {
+            this.callback = callback;
         }
-        // TODO
-        catch (Exception e) {
-            Log.e("---error", e.toString());
+
+        protected JSONObject doInBackground(JSONObject... params) {
+            JSONObject json = params[0];
+
+            // Create POST request.
+            HttpPost request = new HttpPost(SERVER_URL);
+            try {
+                StringEntity entity = new StringEntity(json.toString());
+                entity.setContentType("application/json");
+                request.setEntity(entity);
+
+                // Response from the server.
+                HttpResponse response = client.execute(request);
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+                    return new JSONObject(EntityUtils.toString(response.getEntity()));
+            }
+            // Could not parse JSON, or an empty response.
+            catch (JSONException e) {
+                return null;
+            }
+            // TODO
+            catch (Exception e) {
+                Log.e("---error", e.toString());
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(JSONObject json) {
+            if (callback != null)
+                callback.callback(json);
         }
     }
 }

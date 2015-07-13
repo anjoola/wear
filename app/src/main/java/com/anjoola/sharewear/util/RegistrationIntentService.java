@@ -9,6 +9,7 @@ import com.anjoola.sharewear.ShareWearApplication;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -70,9 +71,6 @@ public class RegistrationIntentService extends IntentService {
             json.put(ServerField.EMAIL, info.email);
             ServerConnection.doPost(json);
         }
-        // TODO
-        catch (Exception e) {
-            Log.e("----", e.toString());
-        }
+        catch (JSONException e) { }
     }
 }

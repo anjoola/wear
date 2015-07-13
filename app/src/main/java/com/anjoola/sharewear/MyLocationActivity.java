@@ -27,10 +27,15 @@ import android.widget.Toast;
 
 import com.anjoola.sharewear.util.KillNotificationService;
 import com.anjoola.sharewear.util.LocationHistoryUtil;
+import com.anjoola.sharewear.util.ServerConnection;
+import com.anjoola.sharewear.util.ServerField;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -185,6 +190,9 @@ public class MyLocationActivity extends ShareWearActivity implements
             mLocationHistoryUtil.updatePath(mOldLocation, location);
         }
         mOldLocation = location;
+
+        // Send new location to server.
+        sendToServer(lat, lng);
     }
 
     @Override
@@ -241,6 +249,19 @@ public class MyLocationActivity extends ShareWearActivity implements
         else {
             getLocation();
         }
+    }
+
+    /**
+     * Clears all locations from server.
+     */
+    private void clearFromServer() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put(ServerField.COMMAND, ServerField.LOCATION_CLEAR);
+            json.put(ServerField.USER_ID, mApp.getGcmToken());
+            ServerConnection.doPost(json);
+        }
+        catch (JSONException e) { }
     }
 
     /**
@@ -317,6 +338,25 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     /**
+     * Sends location to server.
+     * @param lat The latitude.
+     * @param lng The longitude.
+     */
+    private void sendToServer(double lat, double lng) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put(ServerField.COMMAND, ServerField.LOCATION_ADD);
+            json.put(ServerField.USER_ID, mApp.getGcmToken());
+            json.put(ServerField.LATITUDE, lat);
+            json.put(ServerField.LONGITUDE, lng);
+            ServerConnection.doPost(json);
+        }
+        // If we could not send the update, ignore. Try again later with a new
+        // location.
+        catch (JSONException e) { }
+    }
+
+    /**
      * Turn location sharing off.
      */
     public void turnLocationSharingOff() {
@@ -341,6 +381,9 @@ public class MyLocationActivity extends ShareWearActivity implements
         mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
         stopService(mKillIntent);
         unbindService(mConnection);
+
+        // Clear locations from server.
+        clearFromServer();
     }
 
     /**
