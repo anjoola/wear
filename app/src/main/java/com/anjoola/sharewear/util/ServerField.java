@@ -15,6 +15,7 @@ public class ServerField {
 
     public static final String NEW_USER = "new_user";
     public static final String LOCATION_REQUEST = "location_request";
+    public static final String LOCATION_GET = "location_get";
     public static final String LOCATION_ADD = "location_add";
     public static final String LOCATION_CLEAR = "location_clear";
 }
