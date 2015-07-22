@@ -97,6 +97,7 @@
     <!-- Preferences -->
     <string name="pref_user">pref_user</string>
     <string name="pref_contact_details">pref_contact_details</string>
+    <string name="pref_gcm_token">pref_gcm_token</string>
 
     <string name="SENDER_ID">283481130565</string>
 

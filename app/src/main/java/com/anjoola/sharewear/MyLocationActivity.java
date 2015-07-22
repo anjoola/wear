@@ -258,7 +258,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         try {
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_CLEAR);
-            json.put(ServerField.USER_ID, mApp.getGcmToken());
+            json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             ServerConnection.doPost(json);
         }
         catch (JSONException e) { }
@@ -346,7 +346,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         try {
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_ADD);
-            json.put(ServerField.USER_ID, mApp.getGcmToken());
+            json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             json.put(ServerField.LATITUDE, lat);
             json.put(ServerField.LONGITUDE, lng);
             ServerConnection.doPost(json);

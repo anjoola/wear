@@ -1,12 +1,13 @@
 package com.anjoola.sharewear;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Base activity. Contains the code needed for:
  *   - Signing out
  */
-public class ShareWearActivity extends ShareWearBaseActivity {
+public class ShareWearActivity extends FragmentActivity {
     public final static String SIGN_OUT = "SIGN_OUT";
     public final static String PHOTO = "PHOTO";
     public final static String NAME = "NAME";

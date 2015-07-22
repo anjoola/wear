@@ -84,7 +84,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
             signOut();
         }
         // See if we are already logged in. If so, switch to the main activity.
-        else if (prefGetUser() != null) {
+        else if (mApp.prefGetUser() != null) {
             // TODO fix delay here, add loading icon
             toMainActivity(true);
             return;
@@ -158,7 +158,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mApp.googleApiClient);
 
         // Save user details for next startup.
-        prefSetUser(currentUser.getId());
+        mApp.prefSetUser(currentUser.getId());
         toMainActivity(false);
     }
 
@@ -282,7 +282,7 @@ public class LoginActivity extends ShareWearBaseActivity implements
      *  Sign out.
      */
     private void signOut() {
-        prefSetUser(null);
+        mApp.prefSetUser(null);
 
         if (mApp.googleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mApp.googleApiClient);

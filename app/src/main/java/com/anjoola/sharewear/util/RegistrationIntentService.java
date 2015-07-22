@@ -33,15 +33,12 @@ public class RegistrationIntentService extends IntentService {
                 String token = instanceID.getToken(getString(R.string.SENDER_ID),
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
-                // TODO
-                Log.e(TAG, "GCM Registration Token: " + token);
-
                 // Check to see if we need to send the token to the server.
                 ShareWearApplication app = (ShareWearApplication) getApplication();
-                //if (app.getGcmToken() == null || !app.getGcmToken().equals(token))
+                if (app.prefGetGcmToken() == null || !app.prefGetGcmToken().equals(token)) {
                     sendRegistrationToServer(token);
-
-                app.setGcmToken(token);
+                    app.prefSetGcmToken(token);
+                }
             }
         }
         catch (Exception e) {

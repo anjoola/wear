@@ -31,14 +31,6 @@ public class ContactDetails {
         this.photoUri = null;
     }
 
-    public ContactDetails(String name, String phone, String email, File photo) {
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.photo = photo;
-        this.photoUri = null;
-    }
-
     public ContactDetails(String name, String phone, String email,
                           String photoUri) {
         this.name = name;
@@ -103,10 +95,6 @@ public class ContactDetails {
                         cursor.getString(ProfileQuery.FAMILY_NAME);
             else if (mime_type.equals(Phone.CONTENT_ITEM_TYPE))
                 phone = cursor.getString(ProfileQuery.PHONE_NUMBER);
-            // TODO contact photo
-            // else if (mime_type.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE))
-            //photo???
-            // user_profile.addPossiblePhoto(Uri.parse(cursor.getString(ProfileQuery.PHOTO)));
         }
         cursor.close();
 
@@ -129,19 +117,17 @@ public class ContactDetails {
     private interface ProfileQuery {
         // Columns to extract from the profile query results.
         String[] PROJECTION = {
-                Email.ADDRESS,
-                StructuredName.FAMILY_NAME,
-                StructuredName.GIVEN_NAME,
-                Phone.NUMBER,
-                Photo.PHOTO_URI,
-                ContactsContract.Contacts.Data.MIMETYPE
+            Email.ADDRESS,
+            StructuredName.FAMILY_NAME,
+            StructuredName.GIVEN_NAME,
+            Phone.NUMBER,
+            ContactsContract.Contacts.Data.MIMETYPE
         };
 
         int EMAIL = 0;
         int FAMILY_NAME = 1;
         int GIVEN_NAME = 2;
         int PHONE_NUMBER = 3;
-        int PHOTO = 4;
-        int MIME_TYPE = 5;
+        int MIME_TYPE = 4;
     }
 }

@@ -139,8 +139,8 @@ public class ContactViewActivity extends ShareWearActivity implements
         try {
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_GET);
-            json.put(ServerField.USER_ID, app.getGcmToken());
-            json.put(ServerField.USER_TO, email); // TODO their email??
+            json.put(ServerField.USER_ID, app.prefGetGcmToken());
+            json.put(ServerField.USER_TO, email);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
         catch (Exception e) { }
@@ -154,8 +154,8 @@ public class ContactViewActivity extends ShareWearActivity implements
         try {
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_REQUEST);
-            json.put(ServerField.USER_ID, app.getGcmToken());
-            json.put(ServerField.USER_TO, email); // TODO their email??
+            json.put(ServerField.USER_ID, app.prefGetGcmToken());
+            json.put(ServerField.USER_TO, email);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
         catch (Exception e) { }
