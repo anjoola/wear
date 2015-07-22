@@ -20,9 +20,8 @@ def send_notification(user_id, requestor_name):
     user_id: User to send notification to.
     requestor_name: Name of the person requesting the location.
     """
-    notification = {}
-    notification["contact_name"] = requestor_name
-    gcm.json_request(registration_ids=[user_id], data=notififcation)
+    notification = { "contact_name": requestor_name }
+    gcm.json_request(registration_ids=[user_id], data=notification)
 
 
 """
