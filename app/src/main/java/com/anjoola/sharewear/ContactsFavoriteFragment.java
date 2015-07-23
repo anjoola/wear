@@ -35,6 +35,9 @@ public class ContactsFavoriteFragment extends Fragment implements
     // List of all contacts.
     private ArrayList<ContactDetails> mContactsList;
 
+    // Number of favorites.
+    private int numFavorites;
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -54,6 +57,7 @@ public class ContactsFavoriteFragment extends Fragment implements
         contactsList.setAdapter(mAdapter);
 
         // Load the favorites.
+        numFavorites = 0;
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 new ContactsListLoader().execute();
@@ -81,8 +85,6 @@ public class ContactsFavoriteFragment extends Fragment implements
      */
     private class ContactsListLoader extends AsyncTask<Void, Void, Cursor> {
 
-        private int favoritesFound = 0;
-
         @Override
         protected Cursor doInBackground(Void... params) {
             SQLiteDatabase db = mApp.mDbHelper.getReadableDatabase();
@@ -104,7 +106,7 @@ public class ContactsFavoriteFragment extends Fragment implements
                 String photoUri = cursor.getString(cursor.getColumnIndex(
                         FavoriteEntry.COLUMN_NAME_PHOTO_URI));
 
-                favoritesFound++;
+                numFavorites++;
                 mContactsList.add(new ContactDetails(name, phone, email, photoUri));
             } while (cursor.moveToNext());
 
@@ -115,11 +117,7 @@ public class ContactsFavoriteFragment extends Fragment implements
         @Override
         protected void onPostExecute(Cursor result) {
             mAdapter.notifyDataSetChanged();
-
-            // No favorites found. Show the "no favorites" view.
-            if (favoritesFound == 0) {
-                mNoFavoritesView.setVisibility(View.VISIBLE);
-            }
+            updateFavoritesDisplay();
         }
     }
 
@@ -136,6 +134,8 @@ public class ContactsFavoriteFragment extends Fragment implements
                 mAdapter.notifyDataSetChanged();
             }
         });
+        numFavorites++;
+        updateFavoritesDisplay();
     }
 
     /**
@@ -164,5 +164,17 @@ public class ContactsFavoriteFragment extends Fragment implements
                 }
             });
         }
+        numFavorites--;
+        updateFavoritesDisplay();
+    }
+
+    /**
+     * Update the favorites display depending on how many favorites there are.
+     */
+    private void updateFavoritesDisplay() {
+        if (numFavorites == 0)
+            mNoFavoritesView.setVisibility(View.VISIBLE);
+        else
+            mNoFavoritesView.setVisibility(View.GONE);
     }
 }

@@ -181,16 +181,14 @@ public class ContactViewActivity extends ShareWearActivity implements
      */
     private boolean favoriteCheck() {
         SQLiteDatabase db = mApp.mDbHelper.getReadableDatabase();
-        String[] selectionArgs = {
-                name,
-                email != null ? email : "NULL",
-                phone != null ? phone : "NULL"
-        };
+
+        String[] selectionArgs = { name, email != null ? email : phone };
+        String selection = email != null ? FavoriteDbHelper.EMAIL_SELECTION :
+                FavoriteDbHelper.PHONE_SELECTION;
 
         // Search database to see if this user exists.
         Cursor cursor = db.query(FavoriteEntry.TABLE_NAME,
-                FavoriteDbHelper.PROJECTION, FavoriteDbHelper.SELECTION,
-                selectionArgs, null, null,
+                FavoriteDbHelper.PROJECTION, selection, selectionArgs, null, null,
                 FavoriteContactContract.FavoriteEntry.COLUMN_NAME_NAME + " ASC");
 
         if (cursor.moveToFirst()) {
@@ -207,15 +205,12 @@ public class ContactViewActivity extends ShareWearActivity implements
      */
     private void favoriteRemove() {
         SQLiteDatabase db = mApp.mDbHelper.getWritableDatabase();
-        String[] selectionArgs = {
-                name,
-                email != null ? email : "NULL",
-                phone != null ? phone : "NULL"
-        };
+        String[] selectionArgs = { name, email != null ? email : phone };
+        String selection = email != null ? FavoriteDbHelper.EMAIL_SELECTION :
+                FavoriteDbHelper.PHONE_SELECTION;
 
         // Delete from the database.
-        db.delete(FavoriteEntry.TABLE_NAME, FavoriteDbHelper.SELECTION,
-                selectionArgs);
+        db.delete(FavoriteEntry.TABLE_NAME, selection, selectionArgs);
 
         // Update UI.
         mIsFavorite = false;

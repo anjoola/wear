@@ -123,9 +123,11 @@ public class ContactsListActivity extends ShareWearActivity implements
     @Override
     public void onPageSelected(int position) {
         // Hide search view in favorites page.
-        mSearchMenuItem.setVisible(position != 0);
-        if (position == 0)
-            mSearchMenuItem.collapseActionView();
+        if (mSearchMenuItem != null) {
+            mSearchMenuItem.setVisible(position != 0);
+            if (position == 0)
+                mSearchMenuItem.collapseActionView();
+        }
     }
 
     @Override

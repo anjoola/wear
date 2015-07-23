@@ -1,7 +1,6 @@
 package com.anjoola.sharewear.util;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -78,10 +77,7 @@ public class ServerConnection {
             catch (JSONException e) {
                 return null;
             }
-            // TODO
-            catch (Exception e) {
-                Log.e("---error", e.toString());
-            }
+            catch (Exception e) { }
 
             return null;
         }

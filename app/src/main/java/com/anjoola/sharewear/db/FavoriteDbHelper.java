@@ -36,10 +36,13 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
     };
 
     // Used for selecting a specific user from the table.
-    public static final String SELECTION =
-            FavoriteEntry.COLUMN_NAME_NAME + " LIKE ? AND (" +
-            FavoriteEntry.COLUMN_NAME_EMAIL + " LIKE ? OR " +
-            FavoriteEntry.COLUMN_NAME_PHONE + " LIKE ?)";
+    public static final String PHONE_SELECTION =
+            FavoriteEntry.COLUMN_NAME_NAME + " LIKE ? AND " +
+            FavoriteEntry.COLUMN_NAME_PHONE + " = ?";
+    public static final String EMAIL_SELECTION =
+            FavoriteEntry.COLUMN_NAME_NAME + " LIKE ? AND " +
+            FavoriteEntry.COLUMN_NAME_EMAIL + " = ?";
+
 
     public FavoriteDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

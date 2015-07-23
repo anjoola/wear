@@ -2,7 +2,6 @@ package com.anjoola.sharewear.util;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.anjoola.sharewear.R;
 import com.anjoola.sharewear.ShareWearApplication;
@@ -39,16 +38,9 @@ public class RegistrationIntentService extends IntentService {
                     sendRegistrationToServer(token);
                     app.prefSetGcmToken(token);
                 }
-                else
-                    Log.e("----", app.prefGetGcmToken());
             }
         }
-        catch (Exception e) {
-            // TODO
-            Log.e(TAG, "Failed to complete token refresh", e);
-            // If an exception happens while fetching the new token or updating our registration data
-            // on a third-party server, this ensures that we'll attempt the update at a later time.
-        }
+        catch (Exception e) { }
     }
 
     /**
