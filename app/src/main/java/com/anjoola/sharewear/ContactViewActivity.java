@@ -1,6 +1,9 @@
 package com.anjoola.sharewear;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anjoola.sharewear.db.FavoriteContactContract;
+import com.anjoola.sharewear.db.FavoriteContactContract.FavoriteEntry;
+import com.anjoola.sharewear.db.FavoriteDbHelper;
 import com.anjoola.sharewear.util.ServerConnection;
 import com.anjoola.sharewear.util.ServerConnectionCallback;
 import com.anjoola.sharewear.util.ServerField;
@@ -43,10 +49,17 @@ public class ContactViewActivity extends ShareWearActivity implements
     // Dividers to hide if necessary.
     private View divider1, divider2;
 
+    // Whether or not this contact is a favorite.
+    private boolean mIsFavorite;
+    private Menu mMenu;
+
+    private ShareWearApplication mApp;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_view_activity);
+        mApp = (ShareWearApplication) getApplication();
 
         // Get objects.
         mPhoto = (ImageView) findViewById(R.id.contact_photo);
@@ -64,13 +77,12 @@ public class ContactViewActivity extends ShareWearActivity implements
         mEmail.setOnClickListener(this);
         mGetLocation.setOnClickListener(this);
 
-        // Get and set contact details.
+        // Get contact details.
         Intent intent = getIntent();
         photoUri = intent.getStringExtra(ShareWearActivity.PHOTO);
         name = intent.getStringExtra(ShareWearActivity.NAME);
         phone = intent.getStringExtra(ShareWearActivity.PHONE);
         email = intent.getStringExtra(ShareWearActivity.EMAIL);
-        setContactDetails();
     }
 
     @Override
@@ -113,7 +125,11 @@ public class ContactViewActivity extends ShareWearActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        mMenu = menu;
         getMenuInflater().inflate(R.menu.contact_view_menu, menu);
+
+        // Set contact details after menu has been created.
+        setContactDetails();
         return true;
     }
 
@@ -121,7 +137,10 @@ public class ContactViewActivity extends ShareWearActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_favorite:
-                // TODO
+                if (mIsFavorite)
+                    favoriteRemove();
+                else
+                    favoriteAdd();
                 return true;
             case R.id.action_sign_out:
                 signOut();
@@ -132,17 +151,84 @@ public class ContactViewActivity extends ShareWearActivity implements
     }
 
     /**
+     * Adds a contact to favorites.
+     */
+    private void favoriteAdd() {
+        SQLiteDatabase db = mApp.mDbHelper.getWritableDatabase();
+
+        // Create key-value map.
+        ContentValues values = new ContentValues();
+        values.put(FavoriteEntry.COLUMN_NAME_NAME, name);
+        values.put(FavoriteEntry.COLUMN_NAME_PHONE, phone);
+        values.put(FavoriteEntry.COLUMN_NAME_EMAIL, email);
+        values.put(FavoriteEntry.COLUMN_NAME_PHOTO_URI, photoUri);
+
+        db.insert(FavoriteEntry.TABLE_NAME, "NULL", values);
+
+        // Update UI.
+        mIsFavorite = true;
+        toggleFavoritesDisplay(true);
+        Toast.makeText(this, R.string.added_favorite, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Checks to see if this contact is a favorite.
+     */
+    private boolean favoriteCheck() {
+        SQLiteDatabase db = mApp.mDbHelper.getReadableDatabase();
+        String[] selectionArgs = {
+                name,
+                email != null ? email : "NULL",
+                phone != null ? phone : "NULL"
+        };
+
+        // Search database to see if this user exists.
+        Cursor cursor = db.query(FavoriteEntry.TABLE_NAME,
+                FavoriteDbHelper.PROJECTION, FavoriteDbHelper.SELECTION,
+                selectionArgs, null, null,
+                FavoriteContactContract.FavoriteEntry.COLUMN_NAME_NAME + " ASC");
+
+        if (cursor.moveToFirst()) {
+            cursor.close();
+            return true;
+        }
+
+        cursor.close();
+        return false;
+    }
+
+    /**
+     * Removes a contact from favorites.
+     */
+    private void favoriteRemove() {
+        SQLiteDatabase db = mApp.mDbHelper.getWritableDatabase();
+        String[] selectionArgs = {
+                name,
+                email != null ? email : "NULL",
+                phone != null ? phone : "NULL"
+        };
+
+        // Delete from the database.
+        db.delete(FavoriteEntry.TABLE_NAME, FavoriteDbHelper.SELECTION,
+                selectionArgs);
+
+        // Update UI.
+        mIsFavorite = false;
+        toggleFavoritesDisplay(false);
+        Toast.makeText(this, R.string.removed_favorite, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
      * Checks with the server to see if the user is currently sharing their
      * location.
      */
     private void getContactLocation() {
-        ShareWearApplication app = (ShareWearApplication) getApplication();
         try {
             String to = email == null || email.length() == 0 ? phone : email;
 
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_GET);
-            json.put(ServerField.USER_ID, app.prefGetGcmToken());
+            json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             json.put(ServerField.USER_TO, to);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
@@ -153,19 +239,18 @@ public class ContactViewActivity extends ShareWearActivity implements
      * Request a contact's current location. Sends a notification to them.
      */
     private void requestLocation() {
-        ShareWearApplication app = (ShareWearApplication) getApplication();
         try {
             String to = email == null || email.length() == 0 ? phone : email;
 
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_REQUEST);
-            json.put(ServerField.USER_ID, app.prefGetGcmToken());
+            json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             json.put(ServerField.USER_TO, to);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
         catch (Exception e) { }
 
-        Toast.makeText(this, R.string.location_request_sent, Toast.LENGTH_SHORT);
+        Toast.makeText(this, R.string.location_request_sent, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -198,6 +283,28 @@ public class ContactViewActivity extends ShareWearActivity implements
         if (photoUri != null) {
             Uri uri = Uri.parse(photoUri);
             mPhoto.setImageURI(uri);
+        }
+
+        // Is this contact a favorite? If so, change the favorites icon display.
+        mIsFavorite = favoriteCheck();
+        toggleFavoritesDisplay(mIsFavorite);
+    }
+
+    /**
+     * Toggle the favorites display (whether or not the star is on).
+     *
+     * @param on True if the star is on.
+     */
+    private void toggleFavoritesDisplay(boolean on) {
+        MenuItem favoriteItem = mMenu.getItem(0);
+
+        if (on) {
+            favoriteItem.setIcon(getDrawable(R.mipmap.ic_star_filled));
+            favoriteItem.setTitle(R.string.remove_favorite);
+        }
+        else {
+            favoriteItem.setIcon(getDrawable(R.mipmap.ic_star_blank));
+            favoriteItem.setTitle(R.string.add_favorite);
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.anjoola.sharewear.db.FavoriteDbHelper;
 import com.anjoola.sharewear.util.ContactDetails;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -19,6 +20,9 @@ public class ShareWearApplication extends Application {
     // Preferences objects.
     SharedPreferences mPref;
     SharedPreferences.Editor mPrefEditor;
+
+    // Database access.
+    FavoriteDbHelper mDbHelper;
 
     // Whether or not location sharing is turned on.
     private boolean mLocationSharingOn = false;
@@ -39,6 +43,8 @@ public class ShareWearApplication extends Application {
         mPref = getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         mPrefEditor = mPref.edit();
         mPrefEditor.apply();
+
+        mDbHelper = new FavoriteDbHelper(getApplicationContext());
     }
 
     /**

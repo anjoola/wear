@@ -3,10 +3,9 @@ package com.anjoola.sharewear;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.net.Uri;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,10 +15,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SimpleCursorAdapter;
 
+import com.anjoola.sharewear.db.FavoriteContactContract.FavoriteEntry;
+import com.anjoola.sharewear.db.FavoriteDbHelper;
 import com.anjoola.sharewear.util.ContactsImageProvider;
 
 public class ContactsFavoriteFragment extends Fragment implements
         AdapterView.OnItemClickListener {
+    private ShareWearApplication mApp;
     private View mNoFavoritesView;
 
     // Adapter for mapping contacts to objects in the ListViews.
@@ -36,10 +38,9 @@ public class ContactsFavoriteFragment extends Fragment implements
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.contacts_favorite_fragment, container, false);
-
-        // TODO hide this if the user does have favorites
-        mNoFavoritesView = v.findViewById(R.id.no_favorites_view);
+        mApp = (ShareWearApplication) getActivity().getApplication();
         mImgProvider = new ContactsImageProvider(getActivity().getBaseContext());
+        mNoFavoritesView = v.findViewById(R.id.no_favorites_view);
 
         // Set up contacts list view and adapter.
         GridView contactsList = (GridView) v.findViewById(R.id.contacts_list);
@@ -54,7 +55,7 @@ public class ContactsFavoriteFragment extends Fragment implements
 
         // Cursor for loading all details.
         mMatrixCursor = new MatrixCursor(
-                new String[] {"_id", "photo", "name", "phone", "email"});
+                new String[] { "_id", "photo", "name", "phone", "email"});
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 new ContactsListLoader().execute();
@@ -81,37 +82,47 @@ public class ContactsFavoriteFragment extends Fragment implements
      * Asynchronous class to retrieve and load ListView with contacts.
      */
     private class ContactsListLoader extends AsyncTask<Void, Void, Cursor> {
-        // TODO get correct URI that stores the favorites.
-        // URIs for retrieving contacts information.
-        private final Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;
-        private final Uri DATA_URI = ContactsContract.Data.CONTENT_URI;
+
+        private int favoritesFound = 0;
 
         @Override
         protected Cursor doInBackground(Void... params) {
-            // TODO
-            Cursor cursor = getActivity().getContentResolver().query(CONTACTS_URI, null, null,
-                    null, ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
+            SQLiteDatabase db = mApp.mDbHelper.getReadableDatabase();
+            Cursor cursor = db.query(FavoriteEntry.TABLE_NAME,
+                    FavoriteDbHelper.PROJECTION, null, null, null, null,
+                    FavoriteEntry.COLUMN_NAME_NAME + " ASC");
 
             if (!cursor.moveToFirst())
                 return null;
 
             // Loop through each favorite to display it.
-            int numLoaded = 0;
             do {
-                long contactId = cursor.getLong(cursor.getColumnIndex("_ID"));
+                long id = cursor.getLong(cursor.getColumnIndex(FavoriteEntry._ID));
+                String name = cursor.getString(cursor.getColumnIndex(
+                        FavoriteEntry.COLUMN_NAME_NAME));
+                String phone = cursor.getString(cursor.getColumnIndex(
+                        FavoriteEntry.COLUMN_NAME_PHONE));
+                String email = cursor.getString(cursor.getColumnIndex(
+                        FavoriteEntry.COLUMN_NAME_EMAIL));
+                String photoUri = cursor.getString(cursor.getColumnIndex(
+                        FavoriteEntry.COLUMN_NAME_PHOTO_URI));
 
-                // Retrieve individual fields for this contact.
-                Cursor dCursor = getActivity().getContentResolver().query(DATA_URI, null,
-                        ContactsContract.Data.CONTACT_ID + "=" + contactId,
-                        null, null);
+//                String photoUri = mImgProvider.getDefaultContactUri(name); // TODO default
 
-                // No data, move on.
-                if (!dCursor.moveToFirst()) continue;
+                // Get default photo if contact photo does not exist.
+//                if (photoUri == null)
+//                    photoUri = mImgProvider.getDefaultContactUri(name);
 
-                getContactDetails(dCursor, contactId);
-
-                // TODO
-            } while (++numLoaded < 10 && cursor.moveToNext());
+                // Add contact details to cursor.
+                mMatrixCursor.addRow(new Object[] {
+                        Long.toString(id),
+                        photoUri,
+                        name,
+                        phone,
+                        email
+                });
+                favoritesFound++;
+            } while (cursor.moveToNext());
 
             cursor.close();
             return mMatrixCursor;
@@ -121,81 +132,11 @@ public class ContactsFavoriteFragment extends Fragment implements
         protected void onPostExecute(Cursor result) {
             mAdapter.swapCursor(result);
             mAdapter.notifyDataSetChanged();
-        }
 
-        /**
-         * Get details for the contact at the cursor and add it to the matrix
-         * cursor.
-         *
-         * @param cursor The cursor.
-         */
-        private void getContactDetails(Cursor cursor, long contactId) {
-            // Details to retrieve.
-            String photoUri = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-            String name = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.Contacts.DISPLAY_NAME));
-            String phone = null;
-            String email = null;
-
-            // Loop since there might be multiple entries.
-            do {
-                String columnType = cursor.getString(cursor.getColumnIndex("mimetype"));
-
-                // Phone numbers.
-                if (columnType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
-                    switch (cursor.getInt(cursor.getColumnIndex("data2"))) {
-                        case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                            phone = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                        case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                            if (phone == null)
-                                phone = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                        case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-                            if (phone == null)
-                                phone = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                        case ContactsContract.CommonDataKinds.Phone.TYPE_OTHER:
-                            if (phone == null)
-                                phone = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                    }
-                }
-
-                // Email.
-                if (columnType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
-                    switch (cursor.getInt(cursor.getColumnIndex("data2"))) {
-                        case ContactsContract.CommonDataKinds.Email.TYPE_HOME:
-                            email = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                        case ContactsContract.CommonDataKinds.Email.TYPE_WORK:
-                            if (email == null)
-                                email = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                        case ContactsContract.CommonDataKinds.Email.TYPE_OTHER:
-                            if (email == null)
-                                email = cursor.getString(cursor.getColumnIndex("data1"));
-                            break;
-                    }
-                }
-            } while (cursor.moveToNext());
-
-            // If contact has neither a phone nor email, don't show them.
-            if (phone == null && email == null) return;
-
-            // Get default photo if contact photo does not exist.
-            if (photoUri == null)
-                photoUri = mImgProvider.getDefaultContactUri(name);
-
-            // Add contact details to cursor.
-            mMatrixCursor.addRow(new Object[]{
-                    Long.toString(contactId),
-                    photoUri,
-                    name,
-                    phone,
-                    email
-            });
+            // Favorites found. Hide the "no favorites" view.
+            if (favoritesFound > 0) {
+                mNoFavoritesView.setVisibility(View.GONE);
+            }
         }
     }
 }
