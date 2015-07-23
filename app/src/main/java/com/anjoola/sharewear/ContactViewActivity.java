@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.anjoola.sharewear.db.FavoriteContactContract;
 import com.anjoola.sharewear.db.FavoriteContactContract.FavoriteEntry;
 import com.anjoola.sharewear.db.FavoriteDbHelper;
+import com.anjoola.sharewear.util.ContactDetails;
 import com.anjoola.sharewear.util.ServerConnection;
 import com.anjoola.sharewear.util.ServerConnectionCallback;
 import com.anjoola.sharewear.util.ServerField;
@@ -169,6 +170,10 @@ public class ContactViewActivity extends ShareWearActivity implements
         mIsFavorite = true;
         toggleFavoritesDisplay(true);
         Toast.makeText(this, R.string.added_favorite, Toast.LENGTH_SHORT).show();
+
+        // Update the favorites view.
+        ((ContactsFavoriteFragment) mApp.favoritesFragment).addNewContact(
+                new ContactDetails(name, phone, email, photoUri));
     }
 
     /**
@@ -216,6 +221,10 @@ public class ContactViewActivity extends ShareWearActivity implements
         mIsFavorite = false;
         toggleFavoritesDisplay(false);
         Toast.makeText(this, R.string.removed_favorite, Toast.LENGTH_SHORT).show();
+
+        // Update the favorites view.
+        ((ContactsFavoriteFragment) mApp.favoritesFragment)
+                .removeContact(name, phone, email);
     }
 
     /**

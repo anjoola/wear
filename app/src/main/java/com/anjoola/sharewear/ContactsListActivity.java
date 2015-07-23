@@ -56,7 +56,7 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         // Page adapter for sliding view.
         ViewPagerAdapter adapter =
-                new ViewPagerAdapter(getSupportFragmentManager(), tabTitles);
+                new ViewPagerAdapter(getSupportFragmentManager(), tabTitles, (ShareWearApplication) getApplication());
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
         tabs.setViewPager(pager);

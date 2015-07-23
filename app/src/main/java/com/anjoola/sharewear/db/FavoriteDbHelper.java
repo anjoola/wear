@@ -14,10 +14,14 @@ public class FavoriteDbHelper extends SQLiteOpenHelper {
     private static final String DB_CREATE =
             "CREATE TABLE " + FavoriteEntry.TABLE_NAME + " (" +
                 FavoriteEntry._ID + " INTEGER PRIMARY KEY," +
-                FavoriteEntry.COLUMN_NAME_NAME + " STRING, " +
-                FavoriteEntry.COLUMN_NAME_PHONE + " STRING, " +
-                FavoriteEntry.COLUMN_NAME_EMAIL + " STRING, " +
-                FavoriteEntry.COLUMN_NAME_PHOTO_URI + " STRING" +
+                FavoriteEntry.COLUMN_NAME_NAME + " STRING," +
+                FavoriteEntry.COLUMN_NAME_PHONE + " STRING," +
+                FavoriteEntry.COLUMN_NAME_EMAIL + " STRING," +
+                FavoriteEntry.COLUMN_NAME_PHOTO_URI + " STRING," +
+                "UNIQUE(" +
+                    FavoriteEntry.COLUMN_NAME_NAME + ", " +
+                    FavoriteEntry.COLUMN_NAME_PHONE + "," +
+                    FavoriteEntry.COLUMN_NAME_EMAIL + ")" +
             ");";
     private static final String DB_DELETE =
         "DROP TABLE IF EXISTS " + FavoriteEntry.TABLE_NAME;

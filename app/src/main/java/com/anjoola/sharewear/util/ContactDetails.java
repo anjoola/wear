@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * Used to encoding and decoding contact information.
  */
-public class ContactDetails {
+public class ContactDetails implements Comparable {
     public String name;
     public String phone;
     public String email;
@@ -38,6 +38,15 @@ public class ContactDetails {
         this.email = email;
         this.photo = null;
         this.photoUri = photoUri;
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        if (!(another instanceof ContactDetails))
+            return -1;
+
+        ContactDetails otherDetails = (ContactDetails) another;
+        return this.name.compareTo(otherDetails.name);
     }
 
     @Override

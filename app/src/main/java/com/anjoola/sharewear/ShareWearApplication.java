@@ -3,6 +3,7 @@ package com.anjoola.sharewear;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 
 import com.anjoola.sharewear.db.FavoriteDbHelper;
 import com.anjoola.sharewear.util.ContactDetails;
@@ -35,6 +36,9 @@ public class ShareWearApplication extends Application {
 
     // Contact details for the current user.
     public String myDetails = null;
+
+    // Reference to the favorites fragment.
+    public Fragment favoritesFragment;
 
     @Override
     public void onCreate() {
