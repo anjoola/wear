@@ -148,8 +148,8 @@ public class ContactsFavoriteFragment extends Fragment implements
         ContactDetails target = null;
         for (ContactDetails contact : mContactsList) {
             if (contact.name.toLowerCase().equals(name.toLowerCase()) &&
-                (contact.phone.equals(phone.toLowerCase()) ||
-                 contact.email.equals(email.toLowerCase()))) {
+                ((contact.phone == null || contact.phone.equals(phone.toLowerCase())) ||
+                (contact.email == null || contact.email.equals(email.toLowerCase())))) {
                 target = contact;
                 break;
             }

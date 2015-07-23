@@ -1,15 +1,17 @@
 package com.anjoola.sharewear;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentProviderOperation;
 import android.content.Intent;
-import android.content.OperationApplicationException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -27,11 +29,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.anjoola.sharewear.util.ContactDetails;
+import com.anjoola.sharewear.util.ContactsImageProvider;
 import com.anjoola.sharewear.util.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +78,8 @@ public class ContactAddActivity extends ShareWearActivity implements
         mImageFile = null;
         mImageFileUri = null;
 
-        getActionBar().setHideOnContentScrollEnabled(false);
+        if (getActionBar() != null)
+            getActionBar().setHideOnContentScrollEnabled(false);
     }
 
     @Override
@@ -159,13 +164,26 @@ public class ContactAddActivity extends ShareWearActivity implements
      * Adds a new contact based on the values filled out in the text fields.
      */
     private void addContact() {
-        // TODO error message if name not filled out
-
-
         // Get filled out fields.
         String name = mName.getText().toString();
         String phone = mPhone.getText().toString();
         String email = mEmail.getText().toString();
+
+        // Make sure a name and one of phone or email is filled out. If not,
+        // show an error dialog.
+        if (name.length() == 0 || (phone.length() == 0 && email.length() == 0)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setPositiveButton(R.string.okay, null);
+
+            builder.setMessage(name.length() == 0 ? R.string.error_name_blank :
+                R.string.error_detail_blank);
+
+            Dialog dialog = builder.create();
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            return;
+        }
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         int contactIdx = ops.size();
@@ -201,27 +219,32 @@ public class ContactAddActivity extends ShareWearActivity implements
 
         // Photo.
         if (mImageFile != null) {
-            int imgLength = (int) mImageFile.length();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream(imgLength);
-            byte[] bytes = new byte[imgLength];
-            FileInputStream inStream;
-
-            // Convert photo to byte stream.
             try {
-                inStream = new FileInputStream(mImageFile);
-                inStream.read(bytes);
-                stream.write(bytes, 0, imgLength);
-                stream.flush();
-            }
-            catch (Exception e) { }
+                // Create compressed bitmap of photo.
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap bitmap = BitmapFactory.decodeStream(
+                        new FileInputStream(mImageFile), null, options);
+                bitmap = ContactsImageProvider.getCompressedBitmap(bitmap,
+                        200, this);
 
-            ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
-                    .withValueBackReference(Data.RAW_CONTACT_ID, contactIdx)
-                    .withValue(Data.MIMETYPE, Photo.CONTENT_ITEM_TYPE)
-                    .withValue(Data.IS_SUPER_PRIMARY, 1)
-                    .withValue(Photo.PHOTO, stream.toByteArray())
-                    .build());
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                        .withValueBackReference(Data.RAW_CONTACT_ID, contactIdx)
+                        .withValue(Data.MIMETYPE, Photo.CONTENT_ITEM_TYPE)
+                        .withValue(Data.IS_SUPER_PRIMARY, 1)
+                        .withValue(Photo.PHOTO, byteArray)
+                        .build());
+            }
+            catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
+
+        // TODO want to add them to a group called "NFC"
 
         // Do a batch operation to insert all data.
         try {
@@ -233,9 +256,11 @@ public class ContactAddActivity extends ShareWearActivity implements
             Intent intent = new Intent(this, ContactAddDoneActivity.class);
             startActivity(intent);
         }
-        // TODO handle exceptions
-        catch (RemoteException exp) {}
-        catch (OperationApplicationException exp) {}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        reset();
     }
 
     /**
@@ -270,5 +295,17 @@ public class ContactAddActivity extends ShareWearActivity implements
         File file = new File(directory.getPath() + File.separator +
                 "IMG_"+ timestamp + ".jpg");
         return file;
+    }
+
+    /**
+     * Resets the fields.
+     */
+    private void reset() {
+        mName.setText("");
+        mPhone.setText("");
+        mEmail.setText("");
+
+        // Reset the take photo image.
+        mPhoto.setImageResource(R.mipmap.ic_add_picture);
     }
 }

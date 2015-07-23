@@ -121,6 +121,26 @@ public class ContactsImageProvider {
     }
 
     /**
+     * Returns a compressed bitmap photo.
+     *
+     * @param photo The bitmap to compress.
+     * @param newHeight The new height of the compressed photo.
+     * @param context Context.
+     * @return A new, compressed bitmap.
+     */
+    public static Bitmap getCompressedBitmap(Bitmap photo, int newHeight,
+                                             Context context) {
+        final float densityMultiplier = context.getResources()
+                .getDisplayMetrics().density;
+
+        int height = (int) (newHeight * densityMultiplier);
+        int width = (int) (height * photo.getWidth() / ((double) photo.getHeight()));
+
+        photo = Bitmap.createScaledBitmap(photo, width, height, true);
+        return photo;
+    }
+
+    /**
      * Returns whether or not the character is a letter or digit.
      *
      * @param c The char to check

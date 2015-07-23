@@ -20,6 +20,9 @@
 
     <!-- LoginActivity -->
     <string name="sign_in_button_text">Sign In with Google+</string>
+    <string name="play_services_error">
+        Google Play Services is not available. This application will close.
+    </string>
 
     <!-- WelcomeActivity -->
     <string name="welcome_title">Welcome to ShareWear</string>
@@ -55,6 +58,11 @@
     <string name="input_phone">Phone</string>
     <string name="input_email">Email</string>
     <string name="switch_to_nfc">Switch to NFC Input</string>
+    <string name="okay">OK</string>
+    <string name="error_name_blank">The name field cannot be left blank.</string>
+    <string name="error_detail_blank">
+        At least one of the phone or email fields must be filled out.
+    </string>
 
     <!-- ContactAddDoneActivity -->
     <string name="phone_empty">No phone number</string>
@@ -91,11 +99,6 @@
     </string>
     <string name="notification_title">Location sharing enabled</string>
     <string name="notification_text">Touch to stop sharing.</string>
-
-    <!-- Error messages -->
-    <string name="play_services_error">
-        Google Play Services is not available. This application will close.
-    </string>
 
     <!-- Preferences -->
     <string name="pref_user">pref_user</string>
