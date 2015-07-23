@@ -29,7 +29,7 @@ public class ShareWearApplication extends Application {
     // Contact details for a newly-created contact.
     public ContactDetails newContactDetails;
 
-    // Contact details for the current users.
+    // Contact details for the current user.
     public String myDetails = null;
 
     @Override
@@ -52,21 +52,6 @@ public class ShareWearApplication extends Application {
     }
 
     /**
-     * Get and set the GCM token for the current user.
-     */
-    public String prefGetGcmToken() {
-        return mPref.getString(getString(R.string.pref_gcm_token), null);
-    }
-    public void prefSetGcmToken(String token) {
-        if (token != null)
-            mPrefEditor.putString(getString(R.string.pref_gcm_token), token);
-        else
-            mPrefEditor.remove(getString(R.string.pref_gcm_token));
-
-        mPrefEditor.commit();
-    }
-
-    /**
      * Get and set contact details for the current user.
      */
     public String prefGetContactDetails() {
@@ -77,6 +62,21 @@ public class ShareWearApplication extends Application {
             mPrefEditor.putString(getString(R.string.pref_contact_details), details);
         else
             mPrefEditor.remove(getString(R.string.pref_contact_details));
+
+        mPrefEditor.commit();
+    }
+
+    /**
+     * Get and set the GCM token for the current user.
+     */
+    public String prefGetGcmToken() {
+        return mPref.getString(getString(R.string.pref_gcm_token), null);
+    }
+    public void prefSetGcmToken(String token) {
+        if (token != null)
+            mPrefEditor.putString(getString(R.string.pref_gcm_token), token);
+        else
+            mPrefEditor.remove(getString(R.string.pref_gcm_token));
 
         mPrefEditor.commit();
     }

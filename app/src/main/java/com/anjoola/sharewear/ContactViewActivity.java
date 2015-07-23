@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.anjoola.sharewear.util.ServerConnection;
 import com.anjoola.sharewear.util.ServerConnectionCallback;
@@ -137,10 +138,12 @@ public class ContactViewActivity extends ShareWearActivity implements
     private void getContactLocation() {
         ShareWearApplication app = (ShareWearApplication) getApplication();
         try {
+            String to = email == null || email.length() == 0 ? phone : email;
+
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_GET);
             json.put(ServerField.USER_ID, app.prefGetGcmToken());
-            json.put(ServerField.USER_TO, email);
+            json.put(ServerField.USER_TO, to);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
         catch (Exception e) { }
@@ -152,13 +155,17 @@ public class ContactViewActivity extends ShareWearActivity implements
     private void requestLocation() {
         ShareWearApplication app = (ShareWearApplication) getApplication();
         try {
+            String to = email == null || email.length() == 0 ? phone : email;
+
             JSONObject json = new JSONObject();
             json.put(ServerField.COMMAND, ServerField.LOCATION_REQUEST);
             json.put(ServerField.USER_ID, app.prefGetGcmToken());
-            json.put(ServerField.USER_TO, email);
+            json.put(ServerField.USER_TO, to);
             ServerConnection.doPost(json, new ContactLocationCallback());
         }
         catch (Exception e) { }
+
+        Toast.makeText(this, R.string.location_request_sent, Toast.LENGTH_SHORT);
     }
 
     /**
@@ -201,13 +208,17 @@ public class ContactViewActivity extends ShareWearActivity implements
 
         public void callback(JSONObject json) {
             try {
-                // TODO convert from JSON to LatLng..
                 // Not a ShareWear user.
-                if (json == null)
+                if (json == null) {
                     mTextLocation.setText(R.string.location_not_a_user);
+                    return;
+                }
 
-                    // User is not sharing their location.
-                else if (true/* TODO */) {
+                double lat = Double.parseDouble(json.get(ServerField.LATITUDE).toString());
+                double lng = Double.parseDouble(json.get(ServerField.LONGITUDE).toString());
+
+                // User is not sharing their location.
+                if (lat == -1 && lng == -1) {
                     mTextLocation.setText(R.string.location_request);
                     location = NO_LOCATION;
                 }
@@ -215,11 +226,9 @@ public class ContactViewActivity extends ShareWearActivity implements
                 // User is sharing their location.
                 else {
                     mTextLocation.setText(R.string.location_navigate);
-
-                    double lat = Double.parseDouble(json.get(ServerField.LATITUDE).toString());
-                    double lng = Double.parseDouble(json.get(ServerField.LONGITUDE).toString());
                     location = new LatLng(lat, lng);
                 }
+
             } catch (JSONException e) { }
         }
     }

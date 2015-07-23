@@ -39,6 +39,8 @@ public class RegistrationIntentService extends IntentService {
                     sendRegistrationToServer(token);
                     app.prefSetGcmToken(token);
                 }
+                else
+                    Log.e("----", app.prefGetGcmToken());
             }
         }
         catch (Exception e) {

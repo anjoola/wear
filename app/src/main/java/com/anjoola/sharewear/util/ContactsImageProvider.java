@@ -14,15 +14,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 /**
- * Gets the corresponding photo for a contact, by creating a default-lettered
- * one using the first letter of their name. Courtesy of
+ * Gets the corresponding photo for a contact, or creates a default-lettered
+ * one by using the first letter of their name.
+ *
+ * Courtesy of
  * http://stackoverflow.com/questions/23122088/colored-boxed-with-letters-a-la-gmail.
  */
 public class ContactsImageProvider {
     private final String DEFAULT_CONTACT_PHOTO =
             "android.resource://com.anjoola.sharewear/mipmap/ic_default_picture";
-    private Context mContext;
-
     // Possible default background colors.
     private final int[] DEFAULT_COLORS = {
             Color.parseColor("#f16364"),
@@ -46,6 +46,8 @@ public class ContactsImageProvider {
 
     // Character to draw on default image.
     private final char[] mFirstChar = new char[1];
+
+    private Context mContext;
 
     public ContactsImageProvider(Context context) {
         mContext = context;

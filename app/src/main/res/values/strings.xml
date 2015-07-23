@@ -65,6 +65,7 @@
     <string name="location_not_a_user">Not a ShareWear user</string>
     <string name="location_navigate">Navigate to current location</string>
     <string name="location_request">Request current location</string>
+    <string name="location_request_sent">Location request sent!</string>
     <string name="add_favorite">Add to Favorites</string>
     <string name="remove_favorite">Remove from Favorites</string>
 

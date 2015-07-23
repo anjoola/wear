@@ -25,9 +25,16 @@ import com.google.android.gms.plus.model.people.Person;
 /**
  * First activity. Contains code for logging in.
  */
-public class LoginActivity extends ShareWearBaseActivity implements
+// TODO, bug when logging in the first time..
+    // TODO bug subsequent log ins won't even display the google prompt
+public class LoginActivity extends ShareWearActivity implements
         ConnectionCallbacks, OnConnectionFailedListener,
         View.OnClickListener {
+    // Sign in result code.
+    private static final int RC_SIGN_IN = 0;
+
+    // Sign in progress state, saved.
+    private static final String SAVED_PROGRESS = "sign_in_progress";
 
     // Keep track of whether or not the user has signed in yet. Can be one
     // of three values:
@@ -53,14 +60,8 @@ public class LoginActivity extends ShareWearBaseActivity implements
     // user clicks 'Sign In'.
     private int mSignInError;
 
-    // Sign in result code.
-    private static final int RC_SIGN_IN = 0;
-
-    // Sign in progress state, saved.
-    private static final String SAVED_PROGRESS = "sign_in_progress";
-
     // Application, used for getting the Google API client.
-    ShareWearApplication mApp;
+    private ShareWearApplication mApp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +86,6 @@ public class LoginActivity extends ShareWearBaseActivity implements
         }
         // See if we are already logged in. If so, switch to the main activity.
         else if (mApp.prefGetUser() != null) {
-            // TODO fix delay here, add loading icon
             toMainActivity(true);
             return;
         }
@@ -281,13 +281,16 @@ public class LoginActivity extends ShareWearBaseActivity implements
     /**
      *  Sign out.
      */
-    private void signOut() {
-        mApp.prefSetUser(null);
+    protected void signOut() {
+        mApp.prefSetGcmToken(null);
 
         if (mApp.googleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mApp.googleApiClient);
             mApp.googleApiClient.disconnect();
         }
+
+        mApp.prefSetUser(null);
+        mApp.prefSetContactDetails(null);
     }
 
     /**
@@ -296,12 +299,26 @@ public class LoginActivity extends ShareWearBaseActivity implements
      * @param quickly Whether or not to do this without a transition.
      */
     private void toMainActivity(boolean quickly) {
-        Intent intent = new Intent(this, WelcomeActivity.class);
-        if (quickly) {
+        Intent intent;
+
+        // User has already set up their profile. Move to the contacts listing.
+        if (quickly && mApp.prefGetContactDetails() != null) {
+            intent = new Intent(this, ContactsListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent, 0);
             overridePendingTransition(0, 0);
-        } else {
+        }
+
+        // User has not set up their profile yet.
+        else if (quickly) {
+            intent = new Intent(this, WelcomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent, 0);
+            overridePendingTransition(0, 0);
+        }
+
+        else {
+            intent = new Intent(this, WelcomeActivity.class);
             startActivity(intent);
         }
     }

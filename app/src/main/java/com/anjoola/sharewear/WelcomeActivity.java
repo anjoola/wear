@@ -16,22 +16,23 @@ import com.anjoola.sharewear.util.RegistrationIntentService;
  */
 public class WelcomeActivity extends ShareWearActivity implements
         View.OnClickListener {
-    ShareWearApplication mApp;
+    // Reference to the ShareWear application.
+    private ShareWearApplication mApp;
 
     // Button for editing the local profile.
-    Button mProfileButton;
-    boolean buttonClicked;
+    private Button mProfileButton;
+    private boolean buttonClicked;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_activity);
 
+        mApp = (ShareWearApplication) getApplication();
+
         mProfileButton = (Button) findViewById(R.id.profile_setup_button);
         mProfileButton.setOnClickListener(this);
         buttonClicked = false;
-
-        mApp = (ShareWearApplication) getApplication();
 
         // No action bar.
         ActionBar bar = getActionBar();

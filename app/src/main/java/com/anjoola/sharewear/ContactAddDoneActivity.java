@@ -18,7 +18,7 @@ import com.anjoola.sharewear.util.ContactDetails;
 public class ContactAddDoneActivity extends ShareWearActivity {
     // How long to show this activity before transitioning back to the contacts
     // listing (in milliseconds).
-    final int TRANSITION_TIME = 5 * 1000;
+    final int TRANSITION_TIME = 4 * 1000;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

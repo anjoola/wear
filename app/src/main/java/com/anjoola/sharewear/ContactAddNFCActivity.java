@@ -24,17 +24,17 @@ import android.widget.ImageView;
 public class ContactAddNFCActivity extends ShareWearActivity implements
         View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
     // Animation for NFC.
-    AnimationDrawable animation;
+    private AnimationDrawable animation;
 
     // NFC manager.
-    NfcManager mNfcManager;
-    NfcAdapter mAdapter;
+    private NfcManager mNfcManager;
+    private NfcAdapter mAdapter;
 
     // Prompt for turning on NFC.
     private AlertDialog mNfcDialog;
 
     // Button for switching to manual input.
-    Button mSwitchButton;
+    private Button mSwitchButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
