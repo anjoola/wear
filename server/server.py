@@ -3,6 +3,7 @@ import SocketServer
 
 import cgi
 import json
+import re
 import sqlite3
 
 from gcm import *
@@ -36,18 +37,22 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     # Database cursor.
     c = None
 
-    def get_user(self, email):
+    def get_user(self, user_info):
         """
-        Get the ID of the user with a given email.
+        Get the ID of the user with a given email or phone number.
 
-        email: The user's email.
+        user_info: The user's email or phone number.
         returns: The user's ID, or None if it can't be found.
         """
-        vals = self.c.execute("SELECT id FROM users WHERE email LIKE '%s'"
-                              % email)
+        email = self.parse_email(user_info)
+        phone = self.parse_phone(user_info)
+        vals = self.c.execute(
+            ("SELECT id FROM users WHERE email LIKE '%s' " % email) +
+            ("OR phone LIKE '%s'" % phone)
+        )
         ids = [x for x in vals]
         if len(ids) == 1:
-            return ids[0][0]
+            return str(ids[0][0])
         return None
 
 
@@ -61,8 +66,23 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         vals = self.c.execute("SELECT name FROM users WHERE id = '%s'" % id)
         names = [x for x in vals]
         if len(names) == 1:
-            return names[0][0]
+            return str(names[0][0])
         return None
+
+
+    def parse_phone(self, phone):
+        """
+        Parses a phone number and removes all extraneous characters. Leaves
+        just the numbers.
+        """
+        return re.sub("[+\-\(\)\[\]\ ]", "", phone)
+
+
+    def parse_email(self, email):
+        """
+        Parses an email and makes it into a storable form.
+        """
+        return email.lower()
 
 
     def send_error(self):
@@ -101,8 +121,8 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             # New user. Insert details into database.
             if cmd == "new_user":
                 name = json_data["name"]
-                phone = json_data["phone"]
-                email = json_data["email"]
+                phone = self.parse_phone(json_data["phone"])
+                email = self.parse_email(json_data["email"])
                 print "---New user: ", name, phone, email, id # TODO remove
                 self.c.execute("INSERT INTO users(id, name, phone, email) " +
                                "VALUES('%s', '%s', '%s', '%s')" %
@@ -110,9 +130,9 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
             # Location request from one user to another.
             elif cmd == "location_request":
-                user_email = json_data["to"]
-                print "---Location request: ", user_email # TODO remove
-                other_id = self.get_user(user_email)
+                user_info = json_data["to"]
+                print "---Location request: ", user_info # TODO remove
+                other_id = self.get_user(user_info)
                 requestor = self.get_name(id)
 
                 # Could not find the user.
@@ -124,9 +144,9 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
             # Get location of user, if it exists.
             elif cmd == "location_get":
-                user_email = json_data["to"]
-                print "---Location get: ", user_email # TODO remove
-                id = self.get_user(user_email)
+                user_info = json_data["to"]
+                print "---Location get: ", user_info # TODO remove
+                id = self.get_user(user_info)
 
                 # Could not find user.
                 if id is None:
@@ -134,8 +154,8 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     return
 
                 locations = self.c.execute("SELECT lat, lng FROM locations WHERE " +
-                                           "locations.id = '%s' ORDER BY" +
-                                           "TIMESTAMP DESC LIMIT 1" % id)
+                                           ("locations.id = '%s' " % id) +
+                                           "ORDER BY timestamp DESC LIMIT 1")
                 loc_list = [x for x in locations]
                 if len(loc_list) == 1:
                     lat = loc_list[0][0]
@@ -174,7 +194,8 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.wfile.close()
 
         except Exception as e:
-            print "EXCEPTION:", e # TODO remove
+            import traceback
+            traceback.print_exc()
             self.send_error()
 
 
