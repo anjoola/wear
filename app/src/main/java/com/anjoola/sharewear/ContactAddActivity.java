@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentProviderOperation;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,6 +15,8 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
+import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
@@ -244,7 +247,13 @@ public class ContactAddActivity extends ShareWearActivity implements
             }
         }
 
-        // TODO want to add them to a group called "NFC"
+        // Add to the "ShareWear" group.
+        String group = getString(R.string.app_name);
+        ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, contactIdx)
+                .withValue(Data.MIMETYPE, GroupMembership.CONTENT_ITEM_TYPE)
+                .withValue(GroupMembership.GROUP_ROW_ID, getGroupId(group))
+                .build());
 
         // Do a batch operation to insert all data.
         try {
@@ -260,7 +269,72 @@ public class ContactAddActivity extends ShareWearActivity implements
             e.printStackTrace();
         }
 
+        // Reset fields when done.
         reset();
+    }
+
+    /**
+     * Gets the group ID for a particular group name. If it does not exist,
+     * then creates a new group.
+     *
+     * @param groupName The name of the group.
+     * @return The ID for the group.
+     */
+    private String getGroupId(String groupName) {
+        String groupId = isGroupId(groupName);
+
+        // Create new one if it doesn't exist.
+        if (groupId == null) {
+            ArrayList<ContentProviderOperation> ops =
+                    new ArrayList<ContentProviderOperation>();
+            ops.add(ContentProviderOperation.newInsert(Groups.CONTENT_URI)
+                    .withValue(Groups.TITLE, groupName)
+                    .withValue(Groups.GROUP_VISIBLE, true)
+                    .withValue(Groups.ACCOUNT_NAME, groupName)
+                    .withValue(Groups.ACCOUNT_TYPE, groupName)
+                    .build());
+
+            try {
+                getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            }
+            catch (Exception e) { }
+
+            groupId = isGroupId(groupName);
+        }
+
+        return groupId;
+    }
+
+    /**
+     * Checks to see if the group name has a group ID. If so, return it.
+     * Otherwise, returns null.
+     *
+     * @param groupName The name of the group.
+     * @return The group ID if it exists, or null.
+     */
+    private String isGroupId(String groupName) {
+        String selection = Groups.DELETED + " = ? AND " +
+                Groups.GROUP_VISIBLE + " = ?";
+        String[] selectionArgs = { "0", "1" };
+
+        Cursor cursor = getContentResolver().query(Groups.CONTENT_URI, null,
+                selection, selectionArgs, null);
+        cursor.moveToFirst();
+
+        // Search through the groups.
+        String groupId = null;
+        for (int i = 0; i < cursor.getCount(); i++) {
+            String id = cursor.getString(cursor.getColumnIndex(Groups._ID));
+            String title = cursor.getString(cursor.getColumnIndex(Groups.TITLE));
+
+            if (title.equals(groupName)) {
+                groupId = id;
+                break;
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return groupId;
     }
 
     /**
@@ -307,5 +381,7 @@ public class ContactAddActivity extends ShareWearActivity implements
 
         // Reset the take photo image.
         mPhoto.setImageResource(R.mipmap.ic_add_picture);
+        mImageFile = null;
+        mImageFileUri = null;
     }
 }
