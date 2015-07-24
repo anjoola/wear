@@ -7,7 +7,8 @@ import android.support.v4.app.Fragment;
 
 import com.anjoola.sharewear.db.FavoriteDbHelper;
 import com.anjoola.sharewear.util.ContactDetails;
-import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.util.ArrayList;
 
 /**
  * Contains global state for the application, including the following:
@@ -25,11 +26,11 @@ public class ShareWearApplication extends Application {
     // Database access.
     FavoriteDbHelper mDbHelper;
 
+    // List of all contacts.
+    public ArrayList<ContactDetails> mContactsList;
+
     // Whether or not location sharing is turned on.
     private boolean mLocationSharingOn = false;
-
-    // Google API client for getting account details.
-    public GoogleApiClient googleApiClient;
 
     // Contact details for a newly-created contact.
     public ContactDetails newContactDetails;
@@ -38,7 +39,7 @@ public class ShareWearApplication extends Application {
     public String myDetails = null;
 
     // Reference to the favorites fragment.
-    public Fragment favoritesFragment;
+    public Fragment favoritesFragment = null;
 
     @Override
     public void onCreate() {
@@ -49,6 +50,7 @@ public class ShareWearApplication extends Application {
         mPrefEditor.apply();
 
         mDbHelper = new FavoriteDbHelper(getApplicationContext());
+        mContactsList = new ArrayList<ContactDetails>();
     }
 
     /**
@@ -87,21 +89,6 @@ public class ShareWearApplication extends Application {
             mPrefEditor.putString(getString(R.string.pref_gcm_token), token);
         else
             mPrefEditor.remove(getString(R.string.pref_gcm_token));
-
-        mPrefEditor.commit();
-    }
-
-    /**
-     * Get and set the current user for the Google API connection.
-     */
-    public String prefGetUser() {
-        return mPref.getString(getString(R.string.pref_user), null);
-    }
-    public void prefSetUser(String user) {
-        if (user != null)
-            mPrefEditor.putString(getString(R.string.pref_user), user);
-        else
-            mPrefEditor.remove(getString(R.string.pref_user));
 
         mPrefEditor.commit();
     }
