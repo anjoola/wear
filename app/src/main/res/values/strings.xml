@@ -18,12 +18,6 @@
     <string name="request_title">Location request</string>
     <string name="request_message">is requesting your location</string>
 
-    <!-- LoginActivity -->
-    <string name="sign_in_button_text">Sign In with Google+</string>
-    <string name="play_services_error">
-        Google Play Services is not available. This application will close.
-    </string>
-
     <!-- WelcomeActivity -->
     <string name="welcome_title">Welcome to ShareWear</string>
     <string name="welcome_info">

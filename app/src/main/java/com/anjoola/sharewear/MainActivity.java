@@ -13,7 +13,7 @@ import com.anjoola.sharewear.util.ContactsListLoader;
 /**
  * Main activity. Loading screen.
  */
-public class LoginActivity extends ShareWearActivity {
+public class MainActivity extends ShareWearActivity {
     // Number of contacts to preload before showing main app.
     public final static int NUM_CONTACTS_PRELOAD = 100;
 

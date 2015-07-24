@@ -77,7 +77,7 @@
         <service android:name=".util.KillNotificationService" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainActivity"
             android:noHistory="true"
             android:label="@string/app_name">
             <intent-filter>
