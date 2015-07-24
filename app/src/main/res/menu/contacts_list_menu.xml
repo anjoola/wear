@@ -14,8 +14,4 @@
           android:title="@string/add_contact"
           android:showAsAction="ifRoom" />
 
-    <item android:id="@+id/action_sign_out"
-          android:title="@string/sign_out"
-          android:theme="@style/ShareWearActionBarTheme" />
-
 </menu>

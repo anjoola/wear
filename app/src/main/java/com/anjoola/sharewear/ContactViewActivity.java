@@ -143,9 +143,6 @@ public class ContactViewActivity extends ShareWearActivity implements
                 else
                     favoriteAdd();
                 return true;
-            case R.id.action_sign_out:
-                signOut();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

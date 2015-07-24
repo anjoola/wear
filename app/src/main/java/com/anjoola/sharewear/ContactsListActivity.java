@@ -56,7 +56,8 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         // Page adapter for sliding view.
         ViewPagerAdapter adapter =
-                new ViewPagerAdapter(getSupportFragmentManager(), tabTitles, (ShareWearApplication) getApplication());
+                new ViewPagerAdapter(getSupportFragmentManager(), tabTitles,
+                        (ShareWearApplication) getApplication());
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
         tabs.setViewPager(pager);
@@ -95,9 +96,6 @@ public class ContactsListActivity extends ShareWearActivity implements
             case R.id.action_add:
                 Intent intent = new Intent(this, ContactAddNFCActivity.class);
                 startActivity(intent);
-                return true;
-            case R.id.action_sign_out:
-                signOut();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

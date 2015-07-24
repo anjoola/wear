@@ -19,8 +19,7 @@ public class WelcomeActivity extends ShareWearActivity implements
     // Reference to the ShareWear application.
     private ShareWearApplication mApp;
 
-    // Button for editing the local profile.
-    private Button mProfileButton;
+    // Whether or not the button for editing the local profile has been clicked.
     private boolean buttonClicked;
 
     @Override
@@ -29,9 +28,8 @@ public class WelcomeActivity extends ShareWearActivity implements
         setContentView(R.layout.welcome_activity);
 
         mApp = (ShareWearApplication) getApplication();
-
-        mProfileButton = (Button) findViewById(R.id.profile_setup_button);
-        mProfileButton.setOnClickListener(this);
+        Button profileButton = (Button) findViewById(R.id.profile_setup_button);
+        profileButton.setOnClickListener(this);
         buttonClicked = false;
 
         // No action bar.
@@ -70,7 +68,8 @@ public class WelcomeActivity extends ShareWearActivity implements
      */
     private void checkProfileComplete() {
         String details = ContactDetails.getMyContactDetailsStrict(this);
-        if (details != null && (buttonClicked || mApp.prefGetContactDetails() != null)) {
+        if (details != null &&
+            (buttonClicked || mApp.prefGetContactDetails() != null)) {
             mApp.prefSetContactDetails(details);
             ((ShareWearApplication) getApplication()).myDetails = details;
 

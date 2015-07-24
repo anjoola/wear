@@ -19,8 +19,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v7.app.NotificationCompat;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +43,8 @@ import java.util.Locale;
  * Displays user's current location and location history. Allows user to
  * initiate location sharing with their contacts.
  */
+// TODO doesn't always appear centered on the user
+    // TODO sometimes will say GPS is off when it actually is on
 public class MyLocationActivity extends ShareWearActivity implements
         LocationListener, View.OnClickListener {
     // Floating action button for sharing location.
@@ -149,25 +149,6 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         // Turn location sharing off if not at this activity.
         turnLocationSharingOff();
-
-        // TODO unbindService(mConnection);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.my_location_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_sign_out:
-                signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

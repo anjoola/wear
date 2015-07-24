@@ -146,9 +146,6 @@ public class ContactAddActivity extends ShareWearActivity implements
             case R.id.action_add:
                 addContact();
                 return true;
-            case R.id.action_sign_out:
-                signOut();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

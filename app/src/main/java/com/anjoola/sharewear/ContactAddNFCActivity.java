@@ -11,8 +11,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.nfc.NfcManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -74,23 +73,6 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.contact_add_nfc_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_sign_out:
-                signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.manual_input_button) {
             toManualInputActivity();
@@ -129,7 +111,7 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
             builder.setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // Go to NFC settings menu.
-                    startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
+                    startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
                 }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

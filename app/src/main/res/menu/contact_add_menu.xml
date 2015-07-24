@@ -7,8 +7,4 @@
           android:title="@string/save"
           android:showAsAction="always" />
 
-    <item android:id="@+id/action_sign_out"
-          android:title="@string/sign_out"
-          android:theme="@style/ShareWearActionBarTheme" />
-
 </menu>

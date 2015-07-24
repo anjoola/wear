@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -50,22 +48,5 @@ public class ContactAddDoneActivity extends ShareWearActivity {
                 finish();
             }
         }, TRANSITION_TIME);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.contact_add_nfc_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_sign_out:
-                signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }
