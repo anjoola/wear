@@ -28,6 +28,8 @@ public class ShareWearApplication extends Application {
 
     // List of all contacts.
     public ArrayList<ContactDetails> mContactsList;
+    public boolean mContactListPreloaded = false;
+    public boolean mContactListLoaded = false;
 
     // Whether or not location sharing is turned on.
     private boolean mLocationSharingOn = false;

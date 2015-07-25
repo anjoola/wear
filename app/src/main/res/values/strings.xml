@@ -22,7 +22,7 @@
     <string name="welcome_title">Welcome to ShareWear</string>
     <string name="welcome_info">
         Set up your local profile to have a name, phone number, and email.
-        This information can be shared with new contacts.
+        This information can be shared with others via ShareWear.
     </string>
     <string name="welcome_button">Go to Profile Setup</string>
 
@@ -37,12 +37,12 @@
 
     <!-- ContactAddNFCActivity -->
     <string name="nfc_description">
-        Use NFC to exchange your contact information with someone else. Bring your phones together
-        and tap the screen.
+        Use NFC to share your contact information with someone else. Bring your phones together
+        and tap your screen to share.
     </string>
     <string name="nfc_prompt_title">NFC is turned off</string>
     <string name="nfc_prompt">
-        NFC must be turned on in order to exchange contact information. Turn it on in Settings.
+        NFC must be turned on in order to share contact information. Turn it on in Settings.
     </string>
     <string name="switch_to_manual">Switch to Manual Input</string>
     <string name="nfc_input_title">Input via NFC</string>
@@ -55,7 +55,7 @@
     <string name="okay">OK</string>
     <string name="error_name_blank">The name field cannot be left blank.</string>
     <string name="error_detail_blank">
-        At least one of the phone or email fields must be filled out.
+        Either the phone or email fields must be filled out.
     </string>
 
     <!-- ContactAddDoneActivity -->
@@ -69,9 +69,9 @@
     <string name="location_request">Request current location</string>
     <string name="location_request_sent">Location request sent!</string>
     <string name="add_favorite">Add to Favorites</string>
-    <string name="added_favorite">Contact added to favorites</string>
+    <string name="added_favorite">Contact added to Favorites</string>
     <string name="remove_favorite">Remove from Favorites</string>
-    <string name="removed_favorite">Contact removed from favorites</string>
+    <string name="removed_favorite">Contact removed from Favorites</string>
 
     <!-- MyLocationActivity -->
     <string name="not_sharing_location">Currently Not Sharing</string>
@@ -82,8 +82,7 @@
 
     <string name="start_sharing_prompt_title">Start sharing location?</string>
     <string name="start_sharing_prompt">
-        Your location history will be shared with all contacts for the next 15 minutes or until
-        you stop sharing.
+        Your current location will be shared with all contacts until you stop sharing.
     </string>
     <string name="stop_sharing_prompt_title">Stop sharing location?</string>
     <string name="stop_sharing_prompt">Leaving this screen will stop location sharing.</string>
@@ -95,7 +94,6 @@
     <string name="notification_text">Touch to stop sharing.</string>
 
     <!-- Preferences -->
-    <string name="pref_user">pref_user</string>
     <string name="pref_contact_details">pref_contact_details</string>
     <string name="pref_gcm_token">pref_gcm_token</string>
 

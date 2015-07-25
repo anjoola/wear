@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,11 +14,8 @@ import com.anjoola.sharewear.util.ContactsListLoader;
  * Main activity. Loading screen.
  */
 public class MainActivity extends ShareWearActivity {
-    // How long to show this activity before transitioning to the welcome screen.
-    final int TRANSITION_TIME = 2 * 1000;
-
     // Number of contacts to preload before showing main app.
-    public final static int NUM_CONTACTS_PRELOAD = 200;
+    public final static int NUM_CONTACTS_PRELOAD = 100;
 
     private ShareWearApplication mApp;
 
@@ -45,13 +41,21 @@ public class MainActivity extends ShareWearActivity {
 
         mApp = (ShareWearApplication) getApplication();
         mProgress = (ProgressBar) findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         // Possibly load contacts in the background.
-        new Thread(new Runnable() {
-            public void run() {
-                toNextActivity();
-            }
-        }).start();
+        if (!mApp.mContactListPreloaded) {
+            new Thread(new Runnable() {
+                public void run() {
+                    toNextActivity();
+                }
+            }).start();
+        }
+        mApp.mContactListPreloaded = true;
     }
 
     /**
@@ -71,14 +75,10 @@ public class MainActivity extends ShareWearActivity {
 
         // User has not set up their profile yet.
         else {
-            new Handler().postDelayed(new Runnable() {
-                public void run() {
-                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(intent, 0);
-                overridePendingTransition(0, 0);
-                }
-            }, TRANSITION_TIME);
+            Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent, 0);
+            overridePendingTransition(0, 0);
         }
     }
 

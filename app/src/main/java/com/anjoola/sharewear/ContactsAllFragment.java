@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.anjoola.sharewear.util.ContactDetails;
-import com.anjoola.sharewear.util.ContactsImageProvider;
 import com.anjoola.sharewear.util.ContactsListAdapter;
 import com.anjoola.sharewear.util.ContactsListLoader;
 
@@ -23,16 +22,11 @@ public class ContactsAllFragment extends Fragment implements
     // Adapter for mapping contacts to objects in the ListViews.
     public ContactsListAdapter mAdapter;
 
-    // For getting images for contacts.
-    private ContactsImageProvider mImgProvider;
-
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.contacts_all_fragment, container, false);
-
-        mImgProvider = new ContactsImageProvider(getActivity().getBaseContext());
 
         // Set up contacts list view and adapter.
         ListView contactsList = (ListView) v.findViewById(R.id.contacts_list_all);
@@ -43,30 +37,34 @@ public class ContactsAllFragment extends Fragment implements
         mAdapter = new ContactsListAdapter(getActivity(), app.mContactsList);
         contactsList.setAdapter(mAdapter);
 
-        // Load the rest of the contacts.
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                new ContactsListLoaderAsync(app, getActivity(),
-                    MainActivity.NUM_CONTACTS_PRELOAD, -1).execute();
-            }
-        });
-
-        contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (scrollState != 0)
-                    mAdapter.isScrolling = true;
-                else {
-                    mAdapter.isScrolling = false;
-                    mAdapter.notifyDataSetChanged();
+        if (!app.mContactListLoaded) {
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    int idx = app.mContactsList.size() == 0 ? 0 :
+                            MainActivity.NUM_CONTACTS_PRELOAD;
+                    new ContactsListLoaderAsync(app, getActivity(),
+                            idx, -1).execute();
                 }
-            }
+            });
 
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                                 int visibleItemCount, int totalItemCount) {
-            }
-        });
+            contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    if (scrollState != 0)
+                        mAdapter.isScrolling = true;
+                    else {
+                        mAdapter.isScrolling = false;
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem,
+                                     int visibleItemCount, int totalItemCount) {
+                }
+            });
+            app.mContactListLoaded = true;
+        }
 
         contactsList.setFastScrollEnabled(true);
         contactsList.setAnimationCacheEnabled(false);
