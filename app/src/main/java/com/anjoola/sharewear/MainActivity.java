@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -14,8 +15,11 @@ import com.anjoola.sharewear.util.ContactsListLoader;
  * Main activity. Loading screen.
  */
 public class MainActivity extends ShareWearActivity {
+    // How long to show this activity before transitioning to the welcome screen.
+    final int TRANSITION_TIME = 2 * 1000;
+
     // Number of contacts to preload before showing main app.
-    public final static int NUM_CONTACTS_PRELOAD = 100;
+    public final static int NUM_CONTACTS_PRELOAD = 200;
 
     private ShareWearApplication mApp;
 
@@ -55,24 +59,26 @@ public class MainActivity extends ShareWearActivity {
      * listing).
      */
     private void toNextActivity() {
-        Intent intent;
-
         // User has already set up their profile. Preload contacts and move to
         // the contacts listing.
         if (mApp.prefGetContactDetails() != null) {
             ContactsListLoader.loadContacts(mApp, this, 0, NUM_CONTACTS_PRELOAD,
                     new ProgressIncrement());
 
-            intent = new Intent(this, ContactsListActivity.class);
+            Intent intent = new Intent(this, ContactsListActivity.class);
             startActivityForResult(intent, 0);
         }
 
         // User has not set up their profile yet.
         else {
-            intent = new Intent(this, WelcomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, 0);
-            overridePendingTransition(0, 0);
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(intent, 0);
+                overridePendingTransition(0, 0);
+                }
+            }, TRANSITION_TIME);
         }
     }
 

@@ -80,4 +80,7 @@ public class RoundedImageView extends ImageView {
 
         return output;
     }
+
+    @Override
+    public void requestLayout() { }
 }

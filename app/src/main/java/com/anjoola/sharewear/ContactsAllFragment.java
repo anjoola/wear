@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -21,9 +22,6 @@ public class ContactsAllFragment extends Fragment implements
         AdapterView.OnItemClickListener {
     // Adapter for mapping contacts to objects in the ListViews.
     public ContactsListAdapter mAdapter;
-
-    // Number of contacts to load at once.
-    public static int LOAD_NUM = 20;
 
     // For getting images for contacts.
     private ContactsImageProvider mImgProvider;
@@ -40,19 +38,39 @@ public class ContactsAllFragment extends Fragment implements
         ListView contactsList = (ListView) v.findViewById(R.id.contacts_list_all);
         contactsList.setOnItemClickListener(this);
 
-        final ShareWearApplication app = (ShareWearApplication) getActivity().getApplication();
+        final ShareWearApplication app =
+                (ShareWearApplication) getActivity().getApplication();
         mAdapter = new ContactsListAdapter(getActivity(), app.mContactsList);
         contactsList.setAdapter(mAdapter);
 
-        // Load all of the contacts.
-//        getActivity().runOnUiThread(new Runnable() {
-//            public void run() {
-//                new ContactsListLoader(app, 0, 3).execute();
-//            }
-//        });
+        // Load the rest of the contacts.
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                new ContactsListLoaderAsync(app, getActivity(),
+                    MainActivity.NUM_CONTACTS_PRELOAD, -1).execute();
+            }
+        });
 
-        //contactsList.setFastScrollEnabled(true);
-        // contactsList.setTextFilterEnabled(true);
+        contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState != 0)
+                    mAdapter.isScrolling = true;
+                else {
+                    mAdapter.isScrolling = false;
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+            }
+        });
+
+        contactsList.setFastScrollEnabled(true);
+        contactsList.setAnimationCacheEnabled(false);
+        contactsList.setDrawingCacheEnabled(false);
 
         mAdapter.notifyDataSetChanged();
         return v;
@@ -77,7 +95,7 @@ public class ContactsAllFragment extends Fragment implements
     /**
      * Asynchronous class to retrieve and load ListView with contacts.
      */
-    public class ContactsListLoaderAsync extends AsyncTask<Void, Void, Void> {
+    public class ContactsListLoaderAsync extends AsyncTask<Void, Integer, Void> {
         private ShareWearApplication app;
         private Activity activity;
 

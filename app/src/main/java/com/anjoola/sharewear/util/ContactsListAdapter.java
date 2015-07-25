@@ -19,11 +19,11 @@ import java.util.ArrayList;
 /**
  * Adapter used for filtering contacts for searches.
  * Courtesy of https://coderwall.com/p/zpwrsg/add-search-function-to-list-view-in-android.
+ *
+ * Smooth scrolling courtesy of
+ * http://www.javacodegeeks.com/2012/06/android-smooth-list-scrolling.html.
  */
 public class ContactsListAdapter extends BaseAdapter implements Filterable {
-    // Activity that contains this adapter.
-    private Activity activity;
-
     // Used for filtering out contacts.
     private ContactsFilter mFilter;
 
@@ -31,12 +31,20 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
     private ArrayList<ContactDetails> mContactsList;
     private ArrayList<ContactDetails> filteredList;
 
+    public boolean isScrolling;
+
+    // Used for layouts.
+    LayoutInflater mLayoutInflater;
+
     public ContactsListAdapter(Activity activity,
                                ArrayList<ContactDetails> contactsList) {
-        this.activity = activity;
+        mLayoutInflater = (LayoutInflater)
+                activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.mContactsList = contactsList;
         this.filteredList = contactsList;
         getFilter();
+
+        isScrolling = false;
     }
 
     @Override
@@ -61,9 +69,8 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
         final ContactDetails user = (ContactDetails) getItem(position);
 
         if (view == null) {
-            LayoutInflater layoutInflater = (LayoutInflater)
-                    activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.contacts_list_view_all, parent, false);
+            view = mLayoutInflater.inflate(R.layout.contacts_list_view_all,
+                    parent, false);
             holder = new ViewHolder();
             holder.photo = (ImageView) view.findViewById(R.id.photo);
             holder.name = (TextView) view.findViewById(R.id.name);
@@ -74,9 +81,13 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
             holder = (ViewHolder) view.getTag();
         }
 
-        // Set photo and name.
-        holder.photo.setImageURI(Uri.parse(user.photoUri));
+        // Set photo and name. Only show real photo if not scrolling.
         holder.name.setText(user.name);
+        if (!isScrolling)
+            holder.photo.setImageURI(Uri.parse(user.photoUri));
+        else
+            holder.photo.setImageResource(R.mipmap.ic_loading_picture);
+
         return view;
     }
 
@@ -109,7 +120,8 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
 
                 // Find contact with the searched name.
                 for (ContactDetails user : mContactsList) {
-                    if (user.name.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    if (user.name.toLowerCase().contains(
+                            constraint.toString().toLowerCase())) {
                         tempList.add(user);
                     }
                 }
@@ -128,7 +140,8 @@ public class ContactsListAdapter extends BaseAdapter implements Filterable {
 
         @SuppressWarnings("unchecked")
         @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
+        protected void publishResults(CharSequence constraint,
+                                      FilterResults results) {
             filteredList = (ArrayList<ContactDetails>) results.values;
             notifyDataSetChanged();
         }

@@ -10,6 +10,8 @@ import android.provider.ContactsContract.Data;
 
 import com.anjoola.sharewear.ShareWearApplication;
 
+import java.util.ArrayList;
+
 /**
  * Loads contacts.
  */
@@ -24,18 +26,22 @@ public class ContactsListLoader {
      * @param app The application.
      * @param activity The current activity.
      * @param start Index to start at.
-     * @param number Number of contacts to load.
+     * @param number Number of contacts to load, or -1 for the rest of them.
      * @param callback Callback after each contact is loaded.
+     *
+     * @return true if there are no more entries after the last one returned,
+     *         false otherwise.
      */
-    public static void loadContacts(ShareWearApplication app, Activity activity,
+    public static boolean loadContacts(ShareWearApplication app, Activity activity,
                                     int start, int number,
                                     ContactLoadCallback callback) {
+        ArrayList<ContactDetails> contactsList = new ArrayList<ContactDetails>();
         Cursor cursor = activity.getContentResolver().query(
                 CONTACTS_URI, null, null, null, Contacts.DISPLAY_NAME + " ASC ");
 
         // Move to the specified start index, if it exists.
         if (!cursor.moveToPosition(start))
-            return;
+            return false;
 
         // Loop through every contact.
         int numLoaded = 0;
@@ -53,16 +59,18 @@ public class ContactsListLoader {
                 continue;
             }
 
-            getContactDetails(app, activity, dCursor);
+            getContactDetails(contactsList, activity, dCursor);
             dCursor.close();
 
             // Callback after contact is loaded.
             if (callback != null)
                 callback.callback();
 
-        } while (++numLoaded < number && cursor.moveToNext());
+        } while ((++numLoaded < number || number == -1) && cursor.moveToNext());
 
+        app.mContactsList.addAll(contactsList);
         cursor.close();
+        return numLoaded <= number;
     }
 
     /**
@@ -71,22 +79,25 @@ public class ContactsListLoader {
      * @param app The application.
      * @param activity The current activity.
      * @param start Index to start at.
-     * @param number Number of contacts to load.
+     * @param number Number of contacts to load, or -1 for the rest of them.
+     *
+     * @return true if there are no more entries after the last one returned,
+     *         false otherwise.
      */
-    public static void loadContacts(ShareWearApplication app, Activity activity,
+    public static boolean loadContacts(ShareWearApplication app, Activity activity,
                                     int start, int number) {
-        loadContacts(app, activity, start, number, null);
+        return loadContacts(app, activity, start, number, null);
     }
 
     /**
      * Get details for the contact at the cursor. Add to the list of all
      * contacts.
      *
-     * @param app The application.
+     * @param list The temporary list of contacts.
      * @param activity The current activity.
      * @param cursor The cursor.
      */
-    private static void getContactDetails(ShareWearApplication app,
+    private static void getContactDetails(ArrayList<ContactDetails> list,
                                           Activity activity, Cursor cursor) {
         // Details to retrieve.
         String photoUri =
@@ -150,6 +161,6 @@ public class ContactsListLoader {
             photoUri = provider.getDefaultContactUri(name);
         }
 
-        app.mContactsList.add(new ContactDetails(name, phone, email, photoUri));
+        list.add(new ContactDetails(name, phone, email, photoUri));
     }
 }
