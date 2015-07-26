@@ -47,8 +47,8 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         email = self.parse_email(user_info)
         phone = self.parse_phone(user_info)
         vals = self.c.execute(
-            ("SELECT id FROM users WHERE email LIKE '%s' " % email) +
-            ("OR phone LIKE '%s'" % phone)
+            ("SELECT id FROM users WHERE email = '%s' " % email) +
+            ("OR phone = '%s'" % phone)
         )
         ids = [x for x in vals]
         if len(ids) == 1:
@@ -123,7 +123,7 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 name = json_data["name"]
                 phone = self.parse_phone(json_data["phone"])
                 email = self.parse_email(json_data["email"])
-                print "---New user: ", name, phone, email, id # TODO remove
+                print "**Adding new user: ", id, name, phone, email
                 self.c.execute("INSERT INTO users(id, name, phone, email) " +
                                "VALUES('%s', '%s', '%s', '%s')" %
                                (id, name, phone, email))
@@ -131,7 +131,7 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             # Location request from one user to another.
             elif cmd == "location_request":
                 user_info = json_data["to"]
-                print "---Location request: ", user_info # TODO remove
+                print "**Requested " + user_info + "'s location"
                 other_id = self.get_user(user_info)
                 requestor = self.get_name(id)
 
@@ -145,7 +145,7 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             # Get location of user, if it exists.
             elif cmd == "location_get":
                 user_info = json_data["to"]
-                print "---Location get: ", user_info # TODO remove
+                print "**Getting " + user_info + "'s location"
                 id = self.get_user(user_info)
 
                 # Could not find user.
