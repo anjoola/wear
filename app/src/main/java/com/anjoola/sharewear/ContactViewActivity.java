@@ -231,7 +231,7 @@ public class ContactViewActivity extends ShareWearActivity implements
             json.put(ServerField.COMMAND, ServerField.LOCATION_GET);
             json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             json.put(ServerField.USER_TO, to);
-            ServerConnection.doPost(json, new ContactLocationCallback());
+            ServerConnection.doPost(json, new ContactLocationCallback(true));
         }
         catch (Exception e) { }
     }
@@ -247,7 +247,7 @@ public class ContactViewActivity extends ShareWearActivity implements
             json.put(ServerField.COMMAND, ServerField.LOCATION_REQUEST);
             json.put(ServerField.USER_ID, mApp.prefGetGcmToken());
             json.put(ServerField.USER_TO, to);
-            ServerConnection.doPost(json, new ContactLocationCallback());
+            ServerConnection.doPost(json, new ContactLocationCallback(false));
         }
         catch (Exception e) { }
 
@@ -314,11 +314,19 @@ public class ContactViewActivity extends ShareWearActivity implements
      */
     class ContactLocationCallback implements ServerConnectionCallback {
 
+        // Whether or not to change the UI.
+        private boolean changeUI = false;
+
+        public ContactLocationCallback(boolean changeUI) {
+            this.changeUI = changeUI;
+        }
+
         public void callback(JSONObject json) {
             try {
                 // Not a ShareWear user.
                 if (json == null) {
-                    mTextLocation.setText(R.string.location_not_a_user);
+                    if (changeUI)
+                        mTextLocation.setText(R.string.location_not_a_user);
                     return;
                 }
 
@@ -327,13 +335,15 @@ public class ContactViewActivity extends ShareWearActivity implements
 
                 // User is not sharing their location.
                 if (lat == -1 && lng == -1) {
-                    mTextLocation.setText(R.string.location_request);
+                    if (changeUI)
+                        mTextLocation.setText(R.string.location_request);
                     location = NO_LOCATION;
                 }
 
                 // User is sharing their location.
                 else {
-                    mTextLocation.setText(R.string.location_navigate);
+                    if (changeUI)
+                        mTextLocation.setText(R.string.location_navigate);
                     location = new LatLng(lat, lng);
                 }
 

@@ -17,6 +17,8 @@
     <!-- Notifications -->
     <string name="request_title">Location request</string>
     <string name="request_message">is requesting your location</string>
+    <string name="action_share_location">Share my location</string>
+    <string name="action_share_stop">Stop sharing location</string>
 
     <!-- WelcomeActivity -->
     <string name="welcome_title">Welcome to ShareWear</string>

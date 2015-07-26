@@ -118,6 +118,14 @@ public class MyLocationActivity extends ShareWearActivity implements
         mMap.setMyLocationEnabled(true);
 
         mLocationHistoryUtil = new LocationHistoryUtil(mMap);
+
+        // If this was started from Android Wear, then start or stop location
+        // sharing.
+        Intent intent = getIntent();
+        if (intent.getBooleanExtra(ShareWearActivity.START_SHARING, false)) {
+            mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
+            turnLocationSharingOn();
+        }
     }
 
     @Override
@@ -376,6 +384,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         // Change to higher location-update frequency.
         mApp.setLocationSharingOn(true);
         mLocManager.removeUpdates(this);
+        getLocation();
         mLocManager.requestLocationUpdates(mProvider, UPDATE_TIME, 0, this);
         getLocation();
 
