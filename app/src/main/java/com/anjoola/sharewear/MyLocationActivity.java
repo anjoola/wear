@@ -10,10 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -43,16 +41,13 @@ import java.util.Locale;
  * Displays user's current location and location history. Allows user to
  * initiate location sharing with their contacts.
  */
-// TODO doesn't always appear centered on the user
-    // TODO sometimes will say GPS is off when it actually is on
 public class MyLocationActivity extends ShareWearActivity implements
-        LocationListener, View.OnClickListener {
+        GoogleMap.OnMyLocationChangeListener, View.OnClickListener {
     // Floating action button for sharing location.
     private android.support.design.widget.FloatingActionButton mFab;
 
     // Handlers for getting location.
     private LocationManager mLocManager;
-    private String mProvider;
 
     // Google Map to display current location.
     private GoogleMap mMap;
@@ -62,10 +57,6 @@ public class MyLocationActivity extends ShareWearActivity implements
 
     // Previous location.
     private Location mOldLocation;
-
-    // Minimum update time for location updates.
-    private final long UPDATE_TIME = 30000;
-    private final long SLOW_UPDATE_TIME = 300000;
 
     // Utility for drawing location history on the map.
     private LocationHistoryUtil mLocationHistoryUtil;
@@ -100,7 +91,8 @@ public class MyLocationActivity extends ShareWearActivity implements
         mShareOffToast = null;
         mNotification = null;
         mConnection = null;
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
 
         // Set up handler for floating action button.
         mFab = (android.support.design.widget.FloatingActionButton)
@@ -109,13 +101,13 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         // Set up handlers for getting location on map.
         mLocManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mProvider = null;
 
         // Google Maps fragment.
         SupportMapFragment supportMapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.google_map);
         mMap = supportMapFragment.getMap();
         mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationChangeListener(this);
 
         mLocationHistoryUtil = new LocationHistoryUtil(mMap);
 
@@ -160,14 +152,12 @@ public class MyLocationActivity extends ShareWearActivity implements
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onMyLocationChange(Location location) {
         // Get updated location.
         double lat = location.getLatitude();
         double lng = location.getLongitude();
         LatLng latLng = new LatLng(lat, lng);
 
-        // TODO marker
-        //mMap.addMarker(new MarkerOptions().position(latLng));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
 
         // Update text fields.
@@ -181,17 +171,9 @@ public class MyLocationActivity extends ShareWearActivity implements
         mOldLocation = location;
 
         // Send new location to server.
-        sendToServer(lat, lng);
+        if (mApp.isLocationSharingOn())
+            sendToServer(lat, lng);
     }
-
-    @Override
-    public void onStatusChanged(String mProvider, int status, Bundle extras) { }
-
-    @Override
-    public void onProviderEnabled(String mProvider) { }
-
-    @Override
-    public void onProviderDisabled(String mProvider) { }
 
     /**
      * Formats the latitude and longitude into the following:
@@ -235,9 +217,6 @@ public class MyLocationActivity extends ShareWearActivity implements
         if (!mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             promptUserGPSEnable();
         }
-        else {
-            getLocation();
-        }
     }
 
     /**
@@ -251,20 +230,6 @@ public class MyLocationActivity extends ShareWearActivity implements
             ServerConnection.doPost(json);
         }
         catch (JSONException e) { }
-    }
-
-    /**
-     * Gets most recent location.
-     */
-    private void getLocation() {
-        if (mProvider == null) {
-            Criteria criteria = new Criteria();
-            mProvider = mLocManager.getBestProvider(criteria, true);
-        }
-        Location location = mLocManager.getLastKnownLocation(mProvider);
-        if (location != null) {
-            onLocationChanged(location);
-        }
     }
 
     /**
@@ -353,11 +318,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         if (!mApp.isLocationSharingOn()) return;
 
         updateUI(false);
-
-        // Change to lower location-update frequency.
         mApp.setLocationSharingOn(false);
-        mLocManager.removeUpdates(this);
-        mLocManager.requestLocationUpdates(mProvider, SLOW_UPDATE_TIME, 0, this);
 
         // Show toast.
         if (mShareOffToast == null) {
@@ -380,13 +341,6 @@ public class MyLocationActivity extends ShareWearActivity implements
      */
     private void turnLocationSharingOn() {
         updateUI(true);
-
-        // Change to higher location-update frequency.
-        mApp.setLocationSharingOn(true);
-        mLocManager.removeUpdates(this);
-        getLocation();
-        mLocManager.requestLocationUpdates(mProvider, UPDATE_TIME, 0, this);
-        getLocation();
 
         // Show toast.
         if (mShareOnToast == null) {
@@ -433,6 +387,8 @@ public class MyLocationActivity extends ShareWearActivity implements
         mKillIntent = new Intent(this, KillNotificationService.class);
         startService(mKillIntent);
         bindService(mKillIntent, mConnection, BIND_AUTO_CREATE);
+
+        mApp.setLocationSharingOn(true);
     }
 
     /**
