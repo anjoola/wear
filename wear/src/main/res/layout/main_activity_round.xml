@@ -1,16 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context=".MainActivity"
-                tools:deviceIds="wear_round">
+                tools:deviceIds="wear_round"
+                android:background="#ffffff">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/app_icon"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/ic_launcher"
+        android:paddingBottom="8dp"
+        android:layout_alignParentTop="true"
+        android:paddingTop="10dp" />
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/hello_round"/>
+        android:text="@string/app_name"
+        android:textColor="#999999"
+        android:paddingBottom="12dp"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/app_icon"
+        android:textSize="18dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/app_name"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_icon"
+            android:layout_above="@+id/app_name"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/action_share_on" />
+
+        <TextView
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/sharing_on"
+            android:textColor="#aaaaaa"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="10dp" />
+    </LinearLayout>
+
 </RelativeLayout>

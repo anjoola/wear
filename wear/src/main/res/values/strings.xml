@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">ShareWear</string>
-    <string name="hello_round">Hello Round World!</string>
-    <string name="hello_square">Hello Square World!</string>
+    <string name="sharing_on">Start location sharing</string>
+    <string name="sharing_off">Stop location sharing</string>
 </resources>
