@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.anjoola.sharewear"
         minSdkVersion 21
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -20,8 +20,6 @@ android {
     lintOptions {
         abortOnError false
     }
-    productFlavors {
-    }
 }
 
 dependencies {
@@ -29,5 +27,6 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:support-v4:22.2.0'
     compile 'com.google.android.gms:play-services:7.5.+'
+    wearApp project(':wear')
 }
 
