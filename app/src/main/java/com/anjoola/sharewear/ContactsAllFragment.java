@@ -22,6 +22,9 @@ public class ContactsAllFragment extends Fragment implements
     // Adapter for mapping contacts to objects in the ListViews.
     public ContactsListAdapter mAdapter;
 
+    // "Syncing..." display.
+    private View mSyncing;
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -36,6 +39,10 @@ public class ContactsAllFragment extends Fragment implements
                 (ShareWearApplication) getActivity().getApplication();
         mAdapter = new ContactsListAdapter(getActivity(), app.mContactsList);
         contactsList.setAdapter(mAdapter);
+        mSyncing = v.findViewById(R.id.syncing_view);
+
+        if (app.mContactListPreloaded && app.mContactsList.size() > 0)
+            mSyncing.setVisibility(View.GONE);
 
         if (!app.mContactListLoaded) {
             getActivity().runOnUiThread(new Runnable() {
@@ -46,25 +53,25 @@ public class ContactsAllFragment extends Fragment implements
                             idx, -1).execute();
                 }
             });
-
-            contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                    if (scrollState != 0)
-                        mAdapter.isScrolling = true;
-                    else {
-                        mAdapter.isScrolling = false;
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }
-
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem,
-                                     int visibleItemCount, int totalItemCount) {
-                }
-            });
             app.mContactListLoaded = true;
         }
+
+        contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState != 0)
+                    mAdapter.isScrolling = true;
+                else {
+                    mAdapter.isScrolling = false;
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+            }
+        });
 
         contactsList.setFastScrollEnabled(true);
         contactsList.setAnimationCacheEnabled(false);
@@ -121,6 +128,7 @@ public class ContactsAllFragment extends Fragment implements
         @Override
         protected void onPostExecute(Void param) {
             mAdapter.notifyDataSetChanged();
+            mSyncing.setVisibility(View.GONE);
         }
     }
 }

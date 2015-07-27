@@ -1,12 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="0dp">
+    android:padding="0dp"
+    android:gravity="top">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:id="@+id/syncing_view"
+        android:touchscreenBlocksFocus="false"
+        android:paddingBottom="40dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@mipmap/syncing"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/syncing"
+            android:id="@+id/sync_title"
+            android:fontFamily="sans-serif-light"
+            android:textSize="26dp"
+            android:textColor="#cccccc"
+            android:paddingLeft="15dp"/>
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/contacts_list_all"
@@ -14,4 +44,4 @@
         android:layout_height="wrap_content"
         android:divider="@null" />
 
-</LinearLayout>
+</RelativeLayout>
