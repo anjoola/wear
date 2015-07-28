@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ShareWear</string>
     <string name="sharing_on">Start location sharing</string>
+    <string name="sharing_on_success">Sharing Started</string>
     <string name="sharing_off">Stop location sharing</string>
+    <string name="sharing_off_success">Sharing Stopped</string>
 </resources>

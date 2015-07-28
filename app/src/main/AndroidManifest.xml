@@ -76,6 +76,12 @@
 
         <service android:name=".util.KillNotificationService" />
 
+        <service android:name="com.anjoola.sharewear.util.SharingListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:noHistory="true"

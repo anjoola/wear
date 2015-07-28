@@ -11,4 +11,5 @@ public class ShareWearActivity extends FragmentActivity {
     public final static String PHONE = "PHONE";
     public final static String EMAIL = "EMAIL";
     public final static String START_SHARING = "START_SHARING";
+    public final static String STOP_SHARING = "STOP_SHARING";
 }

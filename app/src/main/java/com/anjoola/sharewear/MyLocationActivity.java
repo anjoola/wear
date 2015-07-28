@@ -118,6 +118,10 @@ public class MyLocationActivity extends ShareWearActivity implements
             mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
             turnLocationSharingOn();
         }
+        else if (intent.getBooleanExtra(ShareWearActivity.STOP_SHARING, false)) {
+            mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
+            turnLocationSharingOff();
+        }
     }
 
     @Override
@@ -329,8 +333,11 @@ public class MyLocationActivity extends ShareWearActivity implements
 
         // Hide the notification.
         mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
-        stopService(mKillIntent);
-        unbindService(mConnection);
+
+        try {
+            stopService(mKillIntent);
+            unbindService(mConnection);
+        } catch (Exception e) { }
 
         // Clear locations from server.
         clearFromServer();
