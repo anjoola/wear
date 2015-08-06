@@ -17,6 +17,8 @@ import com.anjoola.sharewear.util.ContactDetails;
 import com.anjoola.sharewear.util.ContactsListAdapter;
 import com.anjoola.sharewear.util.ContactsListLoader;
 
+import java.util.Collections;
+
 public class ContactsAllFragment extends Fragment implements
         AdapterView.OnItemClickListener {
     // Adapter for mapping contacts to objects in the ListViews.
@@ -24,6 +26,8 @@ public class ContactsAllFragment extends Fragment implements
 
     // "Syncing..." display.
     private View mSyncing;
+
+    private ShareWearApplication mApp;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -35,25 +39,24 @@ public class ContactsAllFragment extends Fragment implements
         ListView contactsList = (ListView) v.findViewById(R.id.contacts_list_all);
         contactsList.setOnItemClickListener(this);
 
-        final ShareWearApplication app =
-                (ShareWearApplication) getActivity().getApplication();
-        mAdapter = new ContactsListAdapter(getActivity(), app.mContactsList);
+        mApp = (ShareWearApplication) getActivity().getApplication();
+        mAdapter = new ContactsListAdapter(getActivity(), mApp.mContactsList);
         contactsList.setAdapter(mAdapter);
         mSyncing = v.findViewById(R.id.syncing_view);
 
-        if (app.mContactListPreloaded && app.mContactsList.size() > 0)
+        if (mApp.mContactListPreloaded && mApp.mContactsList.size() > 0)
             mSyncing.setVisibility(View.GONE);
 
-        if (!app.mContactListLoaded) {
+        if (!mApp.mContactListLoaded) {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
-                    int idx = app.mContactsList.size() == 0 ? 0 :
+                    int idx = mApp.mContactsList.size() == 0 ? 0 :
                             MainActivity.NUM_CONTACTS_PRELOAD;
-                    new ContactsListLoaderAsync(app, getActivity(), idx, -1)
+                    new ContactsListLoaderAsync(mApp, getActivity(), idx, -1)
                             .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
-            app.mContactListLoaded = true;
+            mApp.mContactListLoaded = true;
         }
 
         contactsList.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -73,7 +76,6 @@ public class ContactsAllFragment extends Fragment implements
             }
         });
 
-        contactsList.setFastScrollEnabled(true);
         contactsList.setAnimationCacheEnabled(false);
         contactsList.setDrawingCacheEnabled(false);
 
@@ -95,6 +97,21 @@ public class ContactsAllFragment extends Fragment implements
         intent.putExtra(ShareWearActivity.PHONE, entry.phone);
         intent.putExtra(ShareWearActivity.EMAIL, entry.email);
         startActivity(intent);
+    }
+
+    /**
+     * Adds a new contact.
+     * @param contact The new contact.
+     */
+    public void addNewContact(ContactDetails contact) {
+        final ContactDetails details = contact;
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                mApp.mContactsList.add(details);
+                Collections.sort(mApp.mContactsList);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     /**

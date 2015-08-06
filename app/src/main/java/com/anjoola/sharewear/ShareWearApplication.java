@@ -40,7 +40,8 @@ public class ShareWearApplication extends Application {
     // Contact details for the current user.
     public String myDetails = null;
 
-    // Reference to the favorites fragment.
+    // Reference to the contacts fragments.
+    public Fragment allFragment = null;
     public Fragment favoritesFragment = null;
 
     @Override

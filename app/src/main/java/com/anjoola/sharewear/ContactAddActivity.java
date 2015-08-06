@@ -254,6 +254,10 @@ public class ContactAddActivity extends ShareWearActivity implements
             Intent intent = new Intent(this, ContactAddDoneActivity.class);
             startActivity(intent);
 
+            // Update the contacts list view.
+            ((ContactsAllFragment) app.allFragment).addNewContact(
+                    new ContactDetails(name, phone, email, mImageFileUri.toString()));
+
             submitted = true;
         }
         catch (Exception e) {

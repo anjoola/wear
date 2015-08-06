@@ -27,8 +27,9 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         first = new ContactsFavoriteFragment();
         second = new ContactsAllFragment();
 
-        // Used to refresh the favorites view later.
+        // Used to refresh the views later.
         app.favoritesFragment = first;
+        app.allFragment = second;
     }
 
     @Override
