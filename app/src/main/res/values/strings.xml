@@ -23,10 +23,9 @@
     <!-- WelcomeActivity -->
     <string name="welcome_title">Welcome to ShareWear</string>
     <string name="welcome_info">
-        Set up your local profile to have a name, phone number, and email.
-        This information can be shared with others via ShareWear.
+        Set up the information you want to share with others via ShareWear.
     </string>
-    <string name="welcome_button">Go to Profile Setup</string>
+    <string name="welcome_button">Done</string>
 
     <!-- ContactsListActivity -->
     <string name="search_contacts">Search contacts</string>

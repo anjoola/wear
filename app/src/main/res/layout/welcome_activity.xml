@@ -9,47 +9,51 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:id="@+id/background"
-        android:src="@mipmap/nfc_blank"
-        android:layout_alignParentTop="true"
-        android:layout_weight="0.26"
-        android:layout_gravity="center_horizontal"
-        android:background="#ff69ede0"
-        android:adjustViewBounds="false"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"/>
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:id="@+id/scrollview">
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:windowActionBar="false"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ffffff"
+            android:orientation="vertical">
 
-    <LinearLayout
+            <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:windowActionBar="false"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:id="@+id/welcome">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="140dp"
+            android:layout_height="170dp"
             android:id="@+id/welcome_image"
             android:src="@mipmap/contact_card"
             android:layout_alignParentTop="true"
             android:layout_gravity="center_horizontal|top"
             android:background="#ff69ede0"
             android:adjustViewBounds="false"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="40dp"
-            />
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"/>
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/welcome_title"
             android:id="@+id/welcome_title"
-            android:paddingTop="25dp"
+            android:paddingTop="20dp"
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:textSize="26dp"
@@ -67,39 +71,180 @@
             android:textSize="16dp"
             android:textAlignment="center"
             android:gravity="center_horizontal"
-            android:paddingTop="15dp"
-            android:textColor="#999999"/>
+            android:paddingTop="10dp"
+            android:textColor="#999999"
+            android:paddingBottom="20dp"/>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:divider="@android:color/background_light"
-        android:background="@drawable/border_top"
-        android:layout_marginBottom="-1dp"
-        android:layout_marginLeft="-1dp"
-        android:layout_marginRight="-1dp"
-        android:padding="0dp">
+            <LinearLayout
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:id="@+id/dummy_layout"
+                android:orientation="horizontal"
+                android:layout_below="@+id/welcome"/>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/welcome_button"
-            android:id="@+id/profile_setup_button"
-            android:layout_gravity="center"
-            android:layout_alignParentBottom="true"
-            android:layout_alignWithParentIfMissing="true"
-            android:textColor="#777777"
-            android:textStyle="normal"
-            android:textSize="16dp"
-            android:elegantTextHeight="false"
-            style="?android:attr/borderlessButtonStyle"
-            android:fontFamily="sans-serif-light"
-            android:padding="0dp"/>
-    </LinearLayout>
+            <GridLayout
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:rowCount="7"
+                android:columnCount="2"
+                android:layout_below="@+id/dummy_layout">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/icon_person"
+                    android:layout_column="0"
+                    android:layout_row="0"
+                    android:layout_columnSpan="1"
+                    android:src="@mipmap/ic_icon_person"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0.4"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="25dp"/>
+
+                <EditText
+                    android:id="@+id/person_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords|textPersonName"
+                    android:hint="@string/input_name"
+                    android:ems="10"
+                    android:nextFocusUp="@+id/person_name"
+                    android:nextFocusLeft="@+id/person_name"
+                    android:layout_row="0"
+                    android:layout_column="1"
+                    android:layout_columnSpan="1"
+                    android:layout_rowSpan="1"
+                    android:theme="@style/ShareWearTheme"
+                    android:layout_marginRight="86dp" />
+
+                <Space
+                    android:layout_width="20dp"
+                    android:layout_height="8dp"
+                    android:layout_columnSpan="2"
+                    android:layout_column="0"
+                    android:layout_columnWeight="100"
+                    android:layout_row="1"
+                    android:layout_rowSpan="1"
+                    android:layout_gravity="left" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/icon_phone"
+                    android:layout_column="0"
+                    android:layout_row="2"
+                    android:layout_columnSpan="1"
+                    android:src="@mipmap/ic_icon_phone"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0.4"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="25dp" />
+
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:ems="10"
+                    android:id="@+id/person_phone"
+                    android:hint="@string/input_phone"
+                    android:layout_columnSpan="1"
+                    android:layout_column="1"
+                    android:layout_row="2"
+                    android:layout_rowSpan="1"
+                    android:layout_marginRight="86dp" />
+
+                <Space
+                    android:layout_width="20dp"
+                    android:layout_height="8dp"
+                    android:layout_columnSpan="2"
+                    android:layout_column="0"
+                    android:layout_columnWeight="100"
+                    android:layout_row="3"
+                    android:layout_rowSpan="1" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/icon_email"
+                    android:layout_column="0"
+                    android:layout_row="4"
+                    android:layout_columnSpan="1"
+                    android:src="@mipmap/ic_icon_email"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0.4"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="25dp" />
+
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:ems="10"
+                    android:id="@+id/person_email"
+                    android:hint="@string/input_email"
+                    android:layout_rowSpan="1"
+                    android:layout_row="4"
+                    android:layout_columnSpan="1"
+                    android:layout_column="1"
+                    android:layout_marginRight="86dp" />
+
+                <Space
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="2"
+                    android:layout_column="0"
+                    android:layout_row="5"
+                    android:layout_rowSpan="1"
+                    android:id="@+id/spacer"
+                    android:layout_below="@+id/text_entry"
+                    android:layout_above="@+id/button_layout"
+                    android:layout_gravity="bottom" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center|bottom"
+                    android:divider="@android:color/background_light"
+                    android:background="@drawable/border_top"
+                    android:layout_marginBottom="-1dp"
+                    android:layout_marginLeft="-1dp"
+                    android:layout_marginRight="-1dp"
+                    android:padding="0dp"
+                    android:layout_row="6"
+                    android:layout_columnSpan="2"
+                    android:layout_column="0"
+                    android:paddingTop="20dp"
+                    android:layout_marginTop="15dp">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/welcome_button"
+                        android:id="@+id/profile_setup_button"
+                        android:layout_gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:textColor="#777777"
+                        android:textStyle="normal"
+                        android:textSize="16dp"
+                        android:elegantTextHeight="false"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:fontFamily="sans-serif-light"
+                        android:padding="0dp"/>
+                </LinearLayout>
+
+
+            </GridLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

@@ -123,7 +123,6 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 name = json_data["name"]
                 phone = self.parse_phone(json_data["phone"])
                 email = self.parse_email(json_data["email"])
-                print "**Adding new user: ", id, name, phone, email
                 self.c.execute("INSERT INTO users(id, name, phone, email) " +
                                "VALUES('%s', '%s', '%s', '%s')" %
                                (id, name, phone, email))
@@ -131,7 +130,6 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             # Location request from one user to another.
             elif cmd == "location_request":
                 user_info = json_data["to"]
-                print "**Requested " + user_info + "'s location"
                 other_id = self.get_user(user_info)
                 requestor = self.get_name(id)
 
@@ -145,7 +143,6 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             # Get location of user, if it exists.
             elif cmd == "location_get":
                 user_info = json_data["to"]
-                print "**Getting " + user_info + "'s location"
                 id = self.get_user(user_info)
 
                 # Could not find user.
@@ -173,14 +170,12 @@ class ShareWearServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             elif cmd == "location_add":
                 lat = float(json_data["lat"])
                 lng = float(json_data["lng"])
-                print "---Location add: ", lat, lng # TODO remove
                 self.c.execute("INSERT INTO locations(id, timestamp, lat, " +
                                "lng) VALUES('%s', datetime('now'), '%s', '%s')"
                                % (id, lat, lng))
 
             # User clearing all location data.
             elif cmd == "location_clear":
-                print "---Location clear" # TODO remove
                 self.c.execute("DELETE FROM locations WHERE " +
                                "locations.id = '%s'" % id)
 
