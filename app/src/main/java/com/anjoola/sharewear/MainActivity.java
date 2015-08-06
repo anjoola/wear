@@ -3,12 +3,14 @@ package com.anjoola.sharewear;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.anjoola.sharewear.util.ContactLoadCallback;
 import com.anjoola.sharewear.util.ContactsListLoader;
+import com.anjoola.sharewear.util.RegistrationIntentService;
 
 /**
  * Main activity. Loading screen.
@@ -66,6 +68,17 @@ public class MainActivity extends ShareWearActivity {
         // User has already set up their profile. Preload contacts and move to
         // the contacts listing.
         if (mApp.prefGetContactDetails() != null) {
+            // Registration token was not sent to the server yet.
+            if (mApp.prefGetGcmToken() == null) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        new RegistrationIntentService.RegisterAsync(
+                                MainActivity.this, getApplication())
+                                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
+                });
+            }
+
             ContactsListLoader.loadContacts(mApp, this, 0, NUM_CONTACTS_PRELOAD,
                     new ProgressIncrement());
 

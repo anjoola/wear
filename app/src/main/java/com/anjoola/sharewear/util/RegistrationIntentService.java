@@ -1,8 +1,10 @@
 package com.anjoola.sharewear.util;
 
+import android.app.Activity;
 import android.app.Application;
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.AsyncTask;
 
 import com.anjoola.sharewear.R;
 import com.anjoola.sharewear.ShareWearApplication;
@@ -11,6 +13,8 @@ import com.google.android.gms.iid.InstanceID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * Get registration ID and send to server.
@@ -66,6 +70,34 @@ public class RegistrationIntentService extends IntentService {
             ServerConnection.doPost(json, new RegistrationCallback(app, token));
         }
         catch (JSONException e) { }
+    }
+
+    /**
+     * Gets the GCM token and sends it to the server in the background.
+     */
+    public static class RegisterAsync extends AsyncTask<Void, Void, Void> {
+        Activity activity;
+        Application app;
+
+        public RegisterAsync(Activity activity, Application app) {
+            this.activity = activity;
+            this.app = app;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            InstanceID instanceID = InstanceID.getInstance(activity);
+
+            try {
+                String token = instanceID.getToken(
+                        app.getString(R.string.SENDER_ID),
+                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                RegistrationIntentService
+                        .sendRegistrationToServer(app, token);
+            } catch (IOException e) { }
+
+            return null;
+        }
     }
 
     /**

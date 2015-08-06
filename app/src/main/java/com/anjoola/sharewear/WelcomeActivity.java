@@ -12,10 +12,6 @@ import android.widget.EditText;
 
 import com.anjoola.sharewear.util.ContactDetails;
 import com.anjoola.sharewear.util.RegistrationIntentService;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
-
-import java.io.IOException;
 
 /**
  * Welcome screen. Has the user input the data they want to share.
@@ -91,7 +87,9 @@ public class WelcomeActivity extends ShareWearActivity implements
         // Register this with the cloud server.
         runOnUiThread(new Runnable() {
             public void run() {
-                new RegisterAsync().execute();
+                new RegistrationIntentService.RegisterAsync(
+                        WelcomeActivity.this, getApplication())
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
 
@@ -100,24 +98,5 @@ public class WelcomeActivity extends ShareWearActivity implements
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    /**
-     * Gets the GCM token and sends it to the server in the background.
-     */
-    private class RegisterAsync extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            InstanceID instanceID = InstanceID.getInstance(WelcomeActivity.this);
-
-            try {
-                String token = instanceID.getToken(getString(R.string.SENDER_ID),
-                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                RegistrationIntentService
-                        .sendRegistrationToServer(getApplication(), token);
-            } catch (IOException e) { }
-
-            return null;
-        }
     }
 }
