@@ -42,7 +42,8 @@ public class ServerConnection {
         if (client == null)
             client = new DefaultHttpClient();
 
-        new BackgroundNetworkTask(callback).execute(json);
+        new BackgroundNetworkTask(callback)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, json);
     }
 
     /**

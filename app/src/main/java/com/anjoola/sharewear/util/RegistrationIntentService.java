@@ -1,5 +1,6 @@
 package com.anjoola.sharewear.util;
 
+import android.app.Application;
 import android.app.IntentService;
 import android.content.Intent;
 
@@ -34,9 +35,9 @@ public class RegistrationIntentService extends IntentService {
 
                 // Check to see if we need to send the token to the server.
                 ShareWearApplication app = (ShareWearApplication) getApplication();
-                if (app.prefGetGcmToken() == null || !app.prefGetGcmToken().equals(token)) {
-                    sendRegistrationToServer(token);
-                    app.prefSetGcmToken(token);
+                if (app.prefGetGcmToken() == null ||
+                        !app.prefGetGcmToken().equals(token)) {
+                    sendRegistrationToServer(getApplication(), token);
                 }
             }
         }
@@ -45,12 +46,14 @@ public class RegistrationIntentService extends IntentService {
 
     /**
      * Persist registration to cloud server. Send a POST request.
+     *
+     * @param app Reference to the application.
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
+    public static void sendRegistrationToServer(Application app, String token) {
         try {
             // Get details for this user.
-            String details = ((ShareWearApplication) getApplication()).myDetails;
+            String details = ((ShareWearApplication) app).myDetails;
             ContactDetails info = ContactDetails.decodeNfcData(details);
 
             // Construct request.
@@ -60,8 +63,25 @@ public class RegistrationIntentService extends IntentService {
             json.put(ServerField.NAME, info.name);
             json.put(ServerField.PHONE, info.phone);
             json.put(ServerField.EMAIL, info.email);
-            ServerConnection.doPost(json);
+            ServerConnection.doPost(json, new RegistrationCallback(app, token));
         }
         catch (JSONException e) { }
+    }
+
+    /**
+     * Save the token only if we are able to send it to the server.
+     */
+    public static class RegistrationCallback implements ServerConnectionCallback {
+        private ShareWearApplication app;
+        private String token;
+
+        public RegistrationCallback(Application app, String token) {
+            this.app = (ShareWearApplication) app;
+            this.token = token;
+        }
+
+        public void callback(JSONObject json) {
+            app.prefSetGcmToken(token);
+        }
     }
 }

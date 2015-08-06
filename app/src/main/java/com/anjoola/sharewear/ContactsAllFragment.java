@@ -49,8 +49,8 @@ public class ContactsAllFragment extends Fragment implements
                 public void run() {
                     int idx = app.mContactsList.size() == 0 ? 0 :
                             MainActivity.NUM_CONTACTS_PRELOAD;
-                    new ContactsListLoaderAsync(app, getActivity(),
-                            idx, -1).execute();
+                    new ContactsListLoaderAsync(app, getActivity(), idx, -1)
+                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
             app.mContactListLoaded = true;
