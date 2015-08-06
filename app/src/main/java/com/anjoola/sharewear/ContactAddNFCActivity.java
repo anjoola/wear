@@ -12,16 +12,13 @@ import android.nfc.NfcEvent;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 /**
- * Activity to exchange contact information over NFC. Can switch to manual
- * input if NFC is not turned on or not desired.
+ * Activity to share contact information over NFC.
  */
 public class ContactAddNFCActivity extends ShareWearActivity implements
-        View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
+        NfcAdapter.CreateNdefMessageCallback {
     // Animation for NFC.
     private AnimationDrawable animation;
 
@@ -32,9 +29,6 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
     // Prompt for turning on NFC.
     private AlertDialog mNfcDialog;
 
-    // Button for switching to manual input.
-    private Button mSwitchButton;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +36,6 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
 
         // Initialize objects.
         mNfcDialog = null;
-        mSwitchButton = (Button) findViewById(R.id.manual_input_button);
-        mSwitchButton.setOnClickListener(this);
 
         // Get NFC manager and adapter.
         mNfcManager = (NfcManager) this.getApplicationContext()
@@ -70,13 +62,6 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
             animation.start();
         else
             animation.stop();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.manual_input_button) {
-            toManualInputActivity();
-        }
     }
 
     @Override
@@ -116,8 +101,7 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // Switch to manual input.
-                    toManualInputActivity();
+                    finishActivity(0);
                 }
             });
 
@@ -128,14 +112,5 @@ public class ContactAddNFCActivity extends ShareWearActivity implements
             mNfcDialog.setCanceledOnTouchOutside(false);
         }
         mNfcDialog.show();
-    }
-
-    /**
-     * Switch to the manual input activity.
-     */
-    private void toManualInputActivity() {
-        Intent intent = new Intent(this, ContactAddActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(intent);
     }
 }

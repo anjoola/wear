@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:id="@+id/scrollview">
+
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -25,57 +26,59 @@
             android:orientation="vertical">
 
             <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:windowActionBar="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:weightSum="1"
-        android:id="@+id/welcome">
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:windowActionBar="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:id="@+id/welcome">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="170dp"
-            android:id="@+id/welcome_image"
-            android:src="@mipmap/contact_card"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="center_horizontal|top"
-            android:background="#ff69ede0"
-            android:adjustViewBounds="false"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"/>
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="170dp"
+                    android:id="@+id/welcome_image"
+                    android:src="@mipmap/contact_card"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center_horizontal|top"
+                    android:background="#ff69ede0"
+                    android:adjustViewBounds="false"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="0dp"/>
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_title"
-            android:id="@+id/welcome_title"
-            android:paddingTop="20dp"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:textSize="26dp"
-            android:textAlignment="center"
-            android:gravity="center_horizontal"
-            android:fontFamily="sans-serif-light"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/welcome_title"
+                    android:id="@+id/welcome_title"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:textSize="26dp"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal"
+                    android:fontFamily="sans-serif-light"/>
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_info"
-            android:id="@+id/welcome_info"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:textSize="16dp"
-            android:textAlignment="center"
-            android:gravity="center_horizontal"
-            android:paddingTop="10dp"
-            android:textColor="#999999"
-            android:paddingBottom="20dp"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/welcome_info"
+                    android:id="@+id/welcome_info"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:textSize="16dp"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="10dp"
+                    android:textColor="#999999"
+                    android:paddingBottom="20dp"/>
 
-    </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:focusable="true"
@@ -237,9 +240,9 @@
                         android:elegantTextHeight="false"
                         style="?android:attr/borderlessButtonStyle"
                         android:fontFamily="sans-serif-light"
-                        android:padding="0dp"/>
-                </LinearLayout>
+                        android:padding="0dp" />
 
+                </LinearLayout>
 
             </GridLayout>
 

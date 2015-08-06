@@ -7,10 +7,11 @@
     <string name="add_contact">Add Contact</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="sign_out">Sign Out</string>
     <string name="share">Share</string>
-    <string name="save">Save</string>
+    <string name="share_my_info">Share My Info</string>
     <string name="go_to_settings">Go to Settings</string>
     <string name="contact_details">Contact Details</string>
 
@@ -38,6 +39,7 @@
     </string>
 
     <!-- ContactAddNFCActivity -->
+    <string name="share_contact_info">Share Contact Info</string>
     <string name="nfc_description">
         Use NFC to share your contact information with someone else. Bring your phones together
         and tap your screen to share.
@@ -46,8 +48,7 @@
     <string name="nfc_prompt">
         NFC must be turned on in order to share contact information. Turn it on in Settings.
     </string>
-    <string name="switch_to_manual">Switch to Manual Input</string>
-    <string name="nfc_input_title">Input via NFC</string>
+    <string name="nfc_input_title">Share Contact Info</string>
 
     <!-- ContactAddActivity -->
     <string name="input_name">Name</string>

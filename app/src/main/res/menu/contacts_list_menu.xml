@@ -14,4 +14,9 @@
           android:title="@string/add_contact"
           android:showAsAction="always" />
 
+    <item android:id="@+id/action_share"
+          android:icon="@mipmap/ic_share_contact"
+          android:title="@string/share_my_info"
+          android:showAsAction="always" />
+
 </menu>

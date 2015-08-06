@@ -70,34 +70,4 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:divider="@android:color/background_light"
-        android:background="@drawable/border_top"
-        android:layout_marginBottom="-1dp"
-        android:layout_marginLeft="-1dp"
-        android:layout_marginRight="-1dp"
-        android:padding="0dp">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/switch_to_manual"
-            android:id="@+id/manual_input_button"
-            android:layout_gravity="center"
-            android:layout_alignParentBottom="true"
-            android:layout_alignWithParentIfMissing="true"
-            android:textColor="#777777"
-            android:textStyle="normal"
-            android:textSize="16dp"
-            android:elegantTextHeight="false"
-            style="?android:attr/borderlessButtonStyle"
-            android:fontFamily="sans-serif-light"
-            android:padding="0dp"/>
-    </LinearLayout>
-
 </RelativeLayout>

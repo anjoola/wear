@@ -16,20 +16,18 @@ import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
-import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.anjoola.sharewear.util.ContactDetails;
 import com.anjoola.sharewear.util.ContactsImageProvider;
@@ -44,15 +42,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Activity to add new contact information manually. Can switch to input via
- * NFC if desired.
+ * Activity to add new contact information.
  */
 public class ContactAddActivity extends ShareWearActivity implements
         View.OnClickListener {
     private final int CAPTURE_IMAGE_CODE = 100;
-
-    // Button for switching to NFC input.
-    Button mSwitchInputButton;
 
     // EditTexts for inputs.
     EditText mName, mPhone, mEmail;
@@ -63,13 +57,12 @@ public class ContactAddActivity extends ShareWearActivity implements
     File mImageFile;
     Uri mImageFileUri;
 
+    private boolean submitted = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_add_activity);
-
-        mSwitchInputButton = (Button) findViewById(R.id.nfc_input_button);
-        mSwitchInputButton.setOnClickListener(this);
 
         mName = (EditText) findViewById(R.id.person_name);
         mPhone = (EditText) findViewById(R.id.person_phone);
@@ -80,6 +73,7 @@ public class ContactAddActivity extends ShareWearActivity implements
         mPhotoButton.setOnClickListener(this);
         mImageFile = null;
         mImageFileUri = null;
+        reset();
 
         if (getActionBar() != null)
             getActionBar().setHideOnContentScrollEnabled(false);
@@ -88,6 +82,15 @@ public class ContactAddActivity extends ShareWearActivity implements
     @Override
     public void onNewIntent(Intent intent) {
         setIntent(intent);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (submitted) {
+            reset();
+        }
     }
 
     @Override
@@ -108,24 +111,13 @@ public class ContactAddActivity extends ShareWearActivity implements
             mName.setText(info.name);
             mPhone.setText(info.phone);
             mEmail.setText(info.email);
-
-            // Hide the NFC input button.
-            LinearLayout buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
-            buttonLayout.setVisibility(View.INVISIBLE);
         }
     }
 
     @Override
     public void onClick(View v) {
-        // Switch to NFC input. Just bring the activity to the front if it has
-        // already been started.
-        if (v.getId() == R.id.nfc_input_button) {
-            Intent intent = new Intent(this, ContactAddNFCActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        }
         // Start intent to take a picture.
-        else if (v.getId() == R.id.person_photo_button) {
+        if (v.getId() == R.id.person_photo_button) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             mImageFile = getImageFile();
             mImageFileUri = getImageFileUri(mImageFile);
@@ -261,13 +253,12 @@ public class ContactAddActivity extends ShareWearActivity implements
             app.newContactDetails = new ContactDetails(name, phone, email);
             Intent intent = new Intent(this, ContactAddDoneActivity.class);
             startActivity(intent);
+
+            submitted = true;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Reset fields when done.
-        reset();
     }
 
     /**
@@ -380,5 +371,7 @@ public class ContactAddActivity extends ShareWearActivity implements
         mPhoto.setImageResource(R.mipmap.ic_add_picture);
         mImageFile = null;
         mImageFileUri = null;
+
+        submitted = false;
     }
 }

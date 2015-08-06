@@ -92,9 +92,14 @@ public class ContactsListActivity extends ShareWearActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.action_add:
-                Intent intent = new Intent(this, ContactAddNFCActivity.class);
+                intent = new Intent(this, ContactAddActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_share:
+                intent = new Intent(this, ContactAddNFCActivity.class);
                 startActivity(intent);
                 return true;
             default:

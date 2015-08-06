@@ -119,7 +119,7 @@
         <activity
             android:name=".ContactAddNFCActivity"
             android:noHistory="true"
-            android:label="@string/add_contact"
+            android:label="@string/share_contact_info"
             android:parentActivityName="com.anjoola.sharewear.ContactsListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
