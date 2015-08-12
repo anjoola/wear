@@ -75,7 +75,7 @@
         app:elevation="5dp"
         app:pressedTranslationZ="12dp"
         app:fabSize="normal"
-        app:backgroundTint="#FF4081"
+        app:backgroundTint="#F05140"
         app:rippleColor="#ffffbabf"
         android:layout_alignTop="@+id/location_info"
         android:layout_marginTop="-28dp"/>

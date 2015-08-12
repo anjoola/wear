@@ -115,6 +115,7 @@ public class MyLocationActivity extends ShareWearActivity implements
         // sharing.
         Intent intent = getIntent();
         if (intent.getBooleanExtra(ShareWearActivity.START_SHARING, false)) {
+            checkGPSStatus();
             mNotificationManager.cancel(ShareWearApplication.NOTIFICATION_ID);
             turnLocationSharingOn();
         }

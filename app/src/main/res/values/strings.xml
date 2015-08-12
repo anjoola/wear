@@ -54,7 +54,6 @@
     <string name="input_name">Name</string>
     <string name="input_phone">Phone</string>
     <string name="input_email">Email</string>
-    <string name="switch_to_nfc">Switch to NFC Input</string>
     <string name="okay">OK</string>
     <string name="error_name_blank">The name field cannot be left blank.</string>
     <string name="error_detail_blank">
@@ -91,7 +90,7 @@
     <string name="stop_sharing_prompt">Leaving this screen will stop location sharing.</string>
     <string name="gps_prompt_title">GPS is turned off</string>
     <string name="gps_prompt">
-        GPS must be turned on to share your location. Turn it on in Settings
+        GPS must be turned on to share your location. Turn it on in Settings.
     </string>
     <string name="notification_title">Location sharing enabled</string>
     <string name="notification_text">Touch to stop sharing.</string>

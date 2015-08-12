@@ -31,6 +31,7 @@ public class ContactsListActivity extends ShareWearActivity implements
     Fragment mFragment;
     MenuItem mSearchMenuItem;
     SearchView mSearchView;
+    int mPreviousPosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         tabs.setOnPageChangeListener(this);
 
         mFragment = adapter.second;
+        mPreviousPosition = 0;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setQueryHint(getString(R.string.search_contacts));
-        mSearchMenuItem.setVisible(false);
+        mSearchMenuItem.setVisible(mPreviousPosition != 0);
         return true;
     }
 
@@ -115,7 +117,8 @@ public class ContactsListActivity extends ShareWearActivity implements
     @Override
     public boolean onQueryTextChange(String newText) {
         // Filter contacts.
-        ((ContactsAllFragment) mFragment).mAdapter.getFilter().filter(newText);
+        if (((ContactsAllFragment) mFragment).mAdapter != null)
+            ((ContactsAllFragment) mFragment).mAdapter.getFilter().filter(newText);
         return true;
     }
 
@@ -125,6 +128,8 @@ public class ContactsListActivity extends ShareWearActivity implements
 
     @Override
     public void onPageSelected(int position) {
+        mPreviousPosition = position;
+
         // Hide search view in favorites page.
         if (mSearchMenuItem != null) {
             mSearchMenuItem.setVisible(position != 0);
