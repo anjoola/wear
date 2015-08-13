@@ -8,8 +8,6 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 
-import com.anjoola.sharewear.ShareWearApplication;
-
 import java.util.ArrayList;
 
 /**
@@ -23,25 +21,22 @@ public class ContactsListLoader {
     /**
      * Loads contacts from the phone's contact book.
      *
-     * @param app The application.
      * @param activity The current activity.
      * @param start Index to start at.
      * @param number Number of contacts to load, or -1 for the rest of them.
      * @param callback Callback after each contact is loaded.
      *
-     * @return true if there are no more entries after the last one returned,
-     *         false otherwise.
+     * @return List of newly added contacts.
      */
-    public static boolean loadContacts(ShareWearApplication app, Activity activity,
-                                    int start, int number,
-                                    ContactLoadCallback callback) {
+    public static ArrayList<ContactDetails> loadContacts(Activity activity,
+            int start, int number, ContactLoadCallback callback) {
         ArrayList<ContactDetails> contactsList = new ArrayList<ContactDetails>();
         Cursor cursor = activity.getContentResolver().query(
                 CONTACTS_URI, null, null, null, Contacts.DISPLAY_NAME + " ASC ");
 
         // Move to the specified start index, if it exists.
         if (!cursor.moveToPosition(start))
-            return false;
+            return null;
 
         // Loop through every contact.
         int numLoaded = 0;
@@ -68,25 +63,22 @@ public class ContactsListLoader {
 
         } while ((++numLoaded < number || number == -1) && cursor.moveToNext());
 
-        app.mContactsList.addAll(contactsList);
         cursor.close();
-        return numLoaded <= number;
+        return contactsList;
     }
 
     /**
      * Loads contacts from the phone's contact book.
      *
-     * @param app The application.
      * @param activity The current activity.
      * @param start Index to start at.
      * @param number Number of contacts to load, or -1 for the rest of them.
      *
-     * @return true if there are no more entries after the last one returned,
-     *         false otherwise.
+     * @return List of newly added contacts.
      */
-    public static boolean loadContacts(ShareWearApplication app, Activity activity,
-                                    int start, int number) {
-        return loadContacts(app, activity, start, number, null);
+    public static ArrayList<ContactDetails> loadContacts(Activity activity,
+                                                         int start, int number) {
+        return loadContacts(activity, start, number, null);
     }
 
     /**

@@ -17,7 +17,7 @@ import com.anjoola.sharewear.util.RegistrationIntentService;
  */
 public class MainActivity extends ShareWearActivity {
     // Number of contacts to preload before showing main app.
-    public final static int NUM_CONTACTS_PRELOAD = 100;
+    public final static int NUM_CONTACTS_PRELOAD = 50;
 
     private ShareWearApplication mApp;
 
@@ -79,7 +79,7 @@ public class MainActivity extends ShareWearActivity {
                 });
             }
 
-            ContactsListLoader.loadContacts(mApp, this, 0, NUM_CONTACTS_PRELOAD,
+            ContactsListLoader.loadContacts(this, 0, NUM_CONTACTS_PRELOAD,
                     new ProgressIncrement());
 
             Intent intent = new Intent(this, ContactsListActivity.class);

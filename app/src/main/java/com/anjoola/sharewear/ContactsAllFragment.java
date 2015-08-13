@@ -17,10 +17,14 @@ import com.anjoola.sharewear.util.ContactDetails;
 import com.anjoola.sharewear.util.ContactsListAdapter;
 import com.anjoola.sharewear.util.ContactsListLoader;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class ContactsAllFragment extends Fragment implements
         AdapterView.OnItemClickListener {
+    // Number of contacts to load each time.
+    private static int NUM_LOAD = 20;
+
     // Adapter for mapping contacts to objects in the ListViews.
     public ContactsListAdapter mAdapter;
 
@@ -50,9 +54,10 @@ public class ContactsAllFragment extends Fragment implements
         if (!mApp.mContactListLoaded) {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
+                    // Start loading after whatever the main screen loaded.
                     int idx = mApp.mContactsList.size() == 0 ? 0 :
                             MainActivity.NUM_CONTACTS_PRELOAD;
-                    new ContactsListLoaderAsync(mApp, getActivity(), idx, -1)
+                    new ContactsListLoaderAsync(mApp, getActivity(), idx, NUM_LOAD)
                             .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
@@ -110,6 +115,7 @@ public class ContactsAllFragment extends Fragment implements
                 mApp.mContactsList.add(details);
                 Collections.sort(mApp.mContactsList);
                 mAdapter.notifyDataSetChanged();
+                Collections.sort(mApp.mContactsList);
             }
         });
     }
@@ -120,6 +126,10 @@ public class ContactsAllFragment extends Fragment implements
     public class ContactsListLoaderAsync extends AsyncTask<Void, Integer, Void> {
         private ShareWearApplication app;
         private Activity activity;
+
+        // Makes a copy of the list of contacts before putting it into the
+        // real list of contacts.
+        public ArrayList<ContactDetails> listCopy;
 
         // Cursor for retrieving all contacts.
         private int offset;
@@ -138,14 +148,24 @@ public class ContactsAllFragment extends Fragment implements
 
         @Override
         protected Void doInBackground(Void... params) {
-            ContactsListLoader.loadContacts(app, activity, offset, numLoad);
+            listCopy = ContactsListLoader.loadContacts(activity, offset, numLoad);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void param) {
-            mAdapter.notifyDataSetChanged();
-            mSyncing.setVisibility(View.GONE);
+            if (listCopy != null) {
+                app.mContactsList.addAll(listCopy);
+                mAdapter.notifyDataSetChanged();
+                mSyncing.setVisibility(View.GONE);
+            }
+
+            // Still more to load.
+            if (listCopy != null && listCopy.size() > 0) {
+                new ContactsListLoaderAsync(mApp, getActivity(),
+                        offset + NUM_LOAD, NUM_LOAD)
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
         }
     }
 }
