@@ -88,6 +88,7 @@ public class ContactsListActivity extends ShareWearActivity implements
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setQueryHint(getString(R.string.search_contacts));
+
         mSearchMenuItem.setVisible(mPreviousPosition != 0);
         return true;
     }
@@ -132,6 +133,7 @@ public class ContactsListActivity extends ShareWearActivity implements
 
         // Hide search view in favorites page.
         if (mSearchMenuItem != null) {
+            // On the all contacts listing page.
             mSearchMenuItem.setVisible(position != 0);
             if (position == 0)
                 mSearchMenuItem.collapseActionView();

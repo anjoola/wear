@@ -32,6 +32,7 @@ public class ContactsAllFragment extends Fragment implements
     private View mSyncing;
 
     private ShareWearApplication mApp;
+    private Activity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -48,7 +49,7 @@ public class ContactsAllFragment extends Fragment implements
         contactsList.setAdapter(mAdapter);
         mSyncing = v.findViewById(R.id.syncing_view);
 
-        if (mApp.mContactListPreloaded && mApp.mContactsList.size() > 0)
+        if (mApp.mContactListPreloaded && mApp.mContactsList.size() > 0 || mApp.mContactListLoaded)
             mSyncing.setVisibility(View.GONE);
 
         if (!mApp.mContactListLoaded) {
@@ -86,6 +87,18 @@ public class ContactsAllFragment extends Fragment implements
 
         mAdapter.notifyDataSetChanged();
         return v;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mActivity = null;
     }
 
     @Override
@@ -154,6 +167,10 @@ public class ContactsAllFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(Void param) {
+            // Fragment is gone.
+            if (!isAdded())
+                return;
+
             if (listCopy != null) {
                 app.mContactsList.addAll(listCopy);
                 mAdapter.notifyDataSetChanged();

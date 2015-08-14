@@ -30,6 +30,9 @@ public class ContactsListLoader {
      */
     public static ArrayList<ContactDetails> loadContacts(Activity activity,
             int start, int number, ContactLoadCallback callback) {
+        if (activity == null)
+            return null;
+
         ArrayList<ContactDetails> contactsList = new ArrayList<ContactDetails>();
         Cursor cursor = activity.getContentResolver().query(
                 CONTACTS_URI, null, null, null, Contacts.DISPLAY_NAME + " ASC ");

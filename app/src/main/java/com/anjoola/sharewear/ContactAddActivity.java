@@ -247,16 +247,26 @@ public class ContactAddActivity extends ShareWearActivity implements
         // Do a batch operation to insert all data.
         try {
             getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-
-            // Show success page.
             ShareWearApplication app = (ShareWearApplication) getApplication();
             app.newContactDetails = new ContactDetails(name, phone, email);
-            Intent intent = new Intent(this, ContactAddDoneActivity.class);
-            startActivity(intent);
 
             // Update the contacts list view.
+            String photoUri;
+            if (mImageFileUri == null) {
+                ContactsImageProvider provider =
+                        new ContactsImageProvider(getBaseContext());
+                photoUri = provider.getDefaultContactUri(name);
+            }
+            else {
+                photoUri = mImageFileUri.toString();
+            }
+
             ((ContactsAllFragment) app.allFragment).addNewContact(
-                    new ContactDetails(name, phone, email, mImageFileUri.toString()));
+                    new ContactDetails(name, phone, email, photoUri));
+
+            // Show success page.
+            Intent intent = new Intent(this, ContactAddDoneActivity.class);
+            startActivity(intent);
 
             submitted = true;
         }
