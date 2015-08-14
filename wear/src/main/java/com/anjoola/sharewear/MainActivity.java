@@ -12,12 +12,11 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-
-;
 
 public class MainActivity extends Activity implements View.OnClickListener,
      GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -43,6 +42,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
         // Connect the Google API client.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
+                .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
@@ -100,10 +100,6 @@ public class MainActivity extends Activity implements View.OnClickListener,
      * update the UI.
      */
     private void locationShare() {
-
-        // Location services turned off on phone. Cannot share location.
-        //LocationServices.FusedLocationApi.getLocationAvailability().isLocationAvailable()
-
         // Update UI.
         if (!locationSharingOn) {
             mText.setText(R.string.sharing_off);
@@ -143,9 +139,7 @@ public class MainActivity extends Activity implements View.OnClickListener,
         Wearable.MessageApi.sendMessage(mGoogleApiClient, mDevice.getId(), path, null)
             .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                 @Override
-                public void onResult(MessageApi.SendMessageResult result) {
-                    // TODO handle failure?
-                }
+                public void onResult(MessageApi.SendMessageResult result) { }
             });
     }
 }
