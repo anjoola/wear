@@ -261,8 +261,10 @@ public class ContactAddActivity extends ShareWearActivity implements
                 photoUri = mImageFileUri.toString();
             }
 
-            ((ContactsAllFragment) app.allFragment).addNewContact(
-                    new ContactDetails(name, phone, email, photoUri));
+            // Update the contacts listing, if it has already been created.
+            if (app.allFragment != null)
+                ((ContactsAllFragment) app.allFragment).addNewContact(
+                        new ContactDetails(name, phone, email, photoUri));
 
             // Show success page.
             Intent intent = new Intent(this, ContactAddDoneActivity.class);

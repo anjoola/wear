@@ -35,7 +35,7 @@ public class ContactViewActivity extends ShareWearActivity implements
     private final static LatLng NO_LOCATION = new LatLng(-1, -1);
 
     private final static String GOOGLE_MAPS_URI =
-            "http://maps.google.com/maps?daddr=";
+            "http://maps.google.com/maps?q=loc:";
 
     // GridLayouts containing possible actions to take on this contact.
     private GridLayout mCall, mEmail, mGetLocation;
@@ -111,7 +111,8 @@ public class ContactViewActivity extends ShareWearActivity implements
             // If they are currently sharing their location, navigate there.
             else if (location != NO_LOCATION) {
                 Uri destination = Uri.parse(GOOGLE_MAPS_URI +
-                        location.latitude + "," + location.longitude);
+                        location.latitude + "," + location.longitude +
+                        "(" + name + "'s Location)");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, destination);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
@@ -343,7 +344,7 @@ public class ContactViewActivity extends ShareWearActivity implements
                 // User is sharing their location.
                 else {
                     if (changeUI)
-                        mTextLocation.setText(R.string.location_navigate);
+                        mTextLocation.setText(R.string.location_show);
                     location = new LatLng(lat, lng);
                 }
 

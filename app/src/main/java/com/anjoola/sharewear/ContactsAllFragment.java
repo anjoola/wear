@@ -126,7 +126,6 @@ public class ContactsAllFragment extends Fragment implements
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 mApp.mContactsList.add(details);
-                Collections.sort(mApp.mContactsList);
                 mAdapter.notifyDataSetChanged();
                 Collections.sort(mApp.mContactsList);
             }
